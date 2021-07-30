@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?use version="5.1.0"?>
+<plugin name="DigitalTwinConnector" version="5.1.0-r1">
+	<actions>
+		<action label="Start connection with Digital Twin" icon="resources/ObjectToClassView.gif"
+			class="plugin.DigitalTwinConnectorPlugin" tooltip="Start connection with Digital Twin"
+			menu="View" menuitem="Digital Twins" toolbaritem="plugins"
+			id="plugin.DigitalTwinConnectorPlugin">
+		</action>
+	</actions>
+</plugin>
