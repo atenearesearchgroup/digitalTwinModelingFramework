@@ -65,7 +65,7 @@
 	</target>
 
     <target name="release-jar" depends="jar" description="Creates plugin release.">
-    	<zip destfile="dist/ModelValidatorPlugin${build.suffix}.zip">
+    	<zip destfile="dist/DigitalTwinPlugin${build.suffix}.zip">
 			<zipfileset dir="." filemode="755">
     			<include name="README" />
     		</zipfileset>
