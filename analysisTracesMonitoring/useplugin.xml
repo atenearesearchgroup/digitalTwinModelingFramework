@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?use version="5.1.0"?>
+<plugin name="TracesMonitoringPlugin" version="5.1.0-r1">
+	<actions>
+		<action label="Check Available Traces" icon="resources/ObjectToClassView.gif"
+			class="plugin.TracesMonitoringPlugin" tooltip="Check Available Traces"
+			menu="View" menuitem="Digital Twins" toolbaritem="plugins"
+			id="plugin.TracesMonitoringPlugin">
+		</action>
+	</actions>
+</plugin>

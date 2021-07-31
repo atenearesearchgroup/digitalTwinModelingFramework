@@ -5,7 +5,7 @@ reset
 !new InputCarSnapshot('InputCarSnapshot5')
 !new OutputCarSnapshot('OutputCarSnapshot4')
 !InputCarSnapshot5.timestamp := 1627484755+20*4
-!InputCarSnapshot5.executionId := '1627484055'
+!InputCarSnapshot5.executionId := 1627484055
 !InputCarSnapshot5.xPos := 11.12+5.56*3
 !InputCarSnapshot5.angle := 0.0
 !InputCarSnapshot5.isMoving := true
