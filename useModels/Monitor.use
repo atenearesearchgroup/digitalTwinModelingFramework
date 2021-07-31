@@ -32,7 +32,7 @@ end
 abstract class Snapshot
     attributes
         timestamp : Integer
-        executionId : String 
+        executionId : Integer 
     end
 
 abstract class CarSnapshot < Snapshot
@@ -140,6 +140,12 @@ end
 aggregation Mismatches between
 Monitor [0..1] role monitor 
 Mismatch [*] role mismatch
+end
+
+class AnalysisConfiguration -- It is needed to know which execution we want to analyze
+    attributes
+        executionId : Integer       init: 1627763802
+        twinId : String             init: 'NXJCar'
 end
 
 
