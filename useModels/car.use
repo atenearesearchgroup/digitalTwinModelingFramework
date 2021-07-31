@@ -213,6 +213,7 @@ class InputCarSnapshot < CarSnapshot
                 c.xPos := self.xPos;
                 c.yPos := self.yPos;
                 c.angle := self.angle;
+                c.executionId := self.executionId;
                 c.motor.speed := self.speed;
                 c.motor.isMoving := self.isMoving;
                 c.touch.isPressed := self.bump;

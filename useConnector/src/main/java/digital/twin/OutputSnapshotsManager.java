@@ -68,8 +68,8 @@ public class OutputSnapshotsManager {
 			Map<String, String> carValues = new HashMap<>();
 			Map<MAttribute, Value> snapshotAttributes = snapshot.attributeValueMap();
 
-			String snapshotId = "DT:" + getAttribute(snapshotAttributes, "twinId") + ":"
-					+ getAttribute(snapshotAttributes, "executionId") + ":"
+			String snapshotId = "DT:" + getAttribute(snapshotAttributes, "twinId").replace("\'", "") + ":"
+					+ getAttribute(snapshotAttributes, "executionId").replace("\'", "") + ":"
 					+ getAttribute(snapshotAttributes, "timestamp");
 			carValues.put(SNAPSHOT_ID, snapshotId);
 
