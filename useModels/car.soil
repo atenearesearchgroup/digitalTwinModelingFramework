@@ -1,0 +1,6 @@
+reset
+!new Clock('clock');
+!new Car('car');
+!car.init();
+!car.motor.speed:=31.28
+!insert(clock, car) into Timing;

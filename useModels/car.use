@@ -1,0 +1,224 @@
+model Car
+
+enum Action {Forward, Rotate}
+
+--- DIGITAL TWIN
+
+class Car < ActiveObject
+    attributes
+        twinId : String       init: 'NXJCar'
+        executionId : String  init: '1627484055'
+        xPos : Real           init: 0.0
+        yPos : Real           init: 0.0
+        angle : Real          init: 0.0
+        action : Action
+    operations
+        init()
+            begin
+                declare touch : TouchSensor, light : LightSensor, ultrasonic : UltrasonicSensor,
+                    LineFollowingBehav : LineFollowingBehavior, motor : Motor;
+
+                touch := new TouchSensor();
+                insert(self, touch) into TouchSensorConnection;
+
+                light := new LightSensor();
+                insert(self, light) into LightSensorConnection;
+
+                ultrasonic := new UltrasonicSensor();
+                insert(self, ultrasonic) into UltrasonicSensorConnection;
+
+                motor := new Motor();
+                insert(self, motor) into MotorConnection;
+
+                LineFollowingBehav := new LineFollowingBehavior();
+                insert(self, LineFollowingBehav) into CarBehaviors;
+            end
+        action()
+            begin
+                for b in self.behavior do
+                    b.executeBehavior();
+                end;
+            end
+    end
+
+abstract class Behavior
+    operations
+        executeBehavior() begin end
+    end
+
+composition CarBehaviors between
+    Car [1] role car
+    Behavior [1..*] role behavior ordered
+    end 
+
+class LineFollowingBehavior < Behavior
+    attributes
+        rotating : Boolean      init: false
+        sweep : Integer         init: 10
+    operations
+        executeBehavior()
+            begin
+                declare snap : OutputCarSnapshot, a : Action, i : InputCarSnapshot; 
+                i := InputCarSnapshot.allInstances()->select(s:InputCarSnapshot | s.twinId = self.car.twinId and s.timestamp = InputCarSnapshot.allInstances()->collect(s:InputCarSnapshot |s.timestamp)->min())->any(true);
+                if i<>null then 
+                    i.setValues(self.car);
+                    destroy(i);
+                    if self.car.light.lightValue <= 40 then
+                        self.car.motor.forward();
+                        self.car.action := Action::Forward;
+                        self.rotating := false;
+                    else
+                        if not(self.rotating) then
+                            self.sweep := 10;
+                        end;
+                        self.car.motor.rotate(self.sweep);
+                        self.sweep := self.sweep * (-2);
+                        self.car.action := Action::Rotate;
+                        self.rotating := true;
+                    end;
+                end;
+                
+            end
+    end
+
+class TouchSensor
+    attributes
+        isPressed : Boolean     init: false
+    end
+
+class LightSensor
+    attributes 
+        lightValue : Integer    init:45
+    end
+
+class UltrasonicSensor
+    attributes
+        distance : Integer      init:40 -- cm
+    end
+
+class Motor
+    attributes
+        speed : Real            init: 31.28
+        isMoving : Boolean      init: false
+    operations
+        forward() -- If distance > 0, moves forwards, else backwards
+            begin
+                self.car.xPos := self.car.xPos + self.speed*self.car.clock.tickTime*self.car.angle.cos();
+                self.car.yPos := self.car.yPos + self.speed*self.car.clock.tickTime*self.car.angle.sin();
+            end
+        rotate(angle:Real) -- Clockwise if angle > 0, else, counterclockwise
+            begin 
+                self.car.angle := angle;
+            end
+    end
+
+composition UltrasonicSensorConnection between
+    Car [1] role car
+    UltrasonicSensor [0..1] role sound
+    end
+
+composition LightSensorConnection between
+    Car [1] role car
+    LightSensor [0..1] role light
+    end
+
+composition TouchSensorConnection between
+    Car [1] role car
+    TouchSensor [0..1] role touch
+    end
+    
+composition MotorConnection between
+    Car [1] role car
+    Motor [1] role motor
+    end
+
+abstract class ActiveObject
+    operations
+        action() begin end
+    end
+
+class Clock
+    attributes
+        now : Integer           init: 1627484732
+        tickTime : Integer      init : 20
+    operations
+        tick()
+            begin
+                -- mover al coche, para que busque con su id el minimo | condicion para sin input no hacer nada 
+                declare snap : OutputCarSnapshot; 
+                while not(InputCarSnapshot.allInstances->isEmpty()) do 
+                    for o in self.ao do
+                        o.action();
+                        snap := new OutputCarSnapshot();
+                        snap.init(o.oclAsType(Car), self.now);
+                    end;
+                    self.now := self.now + self.tickTime;
+                end;
+            end
+    end
+
+association Timing between
+    Clock [1] role clock
+    ActiveObject [*] role ao ordered
+end
+
+------- DIGITAL SHADOWS
+
+abstract class Snapshot
+    attributes
+        timestamp : Integer
+        executionId : String
+    end
+
+abstract class CarSnapshot < Snapshot
+    attributes
+        twinId : String          init: 'NXJCar'
+        xPos : Real             init: 0.0
+        yPos : Real             init: 0.0
+        angle : Real            init: 0.0
+        speed : Real            init: 31.28
+        isMoving : Boolean      init: false
+        distance : Integer      init: 40  
+        bump : Boolean     init: false         
+        light : Integer init: 45   
+        action : Action       
+        processingQueue : Boolean init: false
+    end
+
+class OutputCarSnapshot < CarSnapshot
+    operations
+        init(car : Car, now : Integer)
+            begin
+                declare c : Car;
+                c := car.oclAsType(Car);
+                self.timestamp := now;
+                self.executionId := c.executionId;
+                self.twinId := c.twinId;
+                self.xPos := c.xPos;
+                self.yPos := c.yPos;
+                self.angle := c.angle;
+                self.action := c.action;
+                -- we cannot "guess" the rest of the attributes' values:
+                -- self.distance ??  
+                -- self.bump ??         
+                -- self.light ??   
+                -- self.processingQueue ???
+            end
+    end
+
+class InputCarSnapshot < CarSnapshot
+    operations
+        setValues(c : Car)
+            begin
+                c.xPos := self.xPos;
+                c.yPos := self.yPos;
+                c.angle := self.angle;
+                c.motor.speed := self.speed;
+                c.motor.isMoving := self.isMoving;
+                c.touch.isPressed := self.bump;
+                c.light.lightValue := self.light;
+                c.sound.distance := self.distance;
+                c.clock.now := self.timestamp;
+            end
+    end
+
