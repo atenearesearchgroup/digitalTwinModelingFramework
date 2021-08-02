@@ -14,7 +14,7 @@ The structure of this repository is the following:
 
 This module is in charge of the car's movement. It retrieves the sensors' data and sends it via Bluetooth to the computer. Once it is received, it is forwarded to the carConnector using a socket.
 
-The car used in our development is a Lego Mindstorms NXT, and we used the firmware [LeJOS](https://web.archive.org/web/20210507030446/http://lejos.org/) to program its behavior.
+The car used in our development is a Lego Mindstorms NXT, and we used the firmware [LeJOS](https://web.archive.org/web/20210507030446/http://lejos.org/) to define its behavior.
 
 ### [carConnector](https://github.com/atenearesearchgroup/digitalTwinModelingFramework/tree/main/carConnector)
 
