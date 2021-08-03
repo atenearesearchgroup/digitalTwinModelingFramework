@@ -7,7 +7,7 @@ enum Action {Forward, Rotate}
 class Car < ActiveObject
     attributes
         twinId : String       init: 'NXJCar'
-        executionId : String  init: '1627484055'
+        executionId : Integer  init: 1627484055
         xPos : Real           init: 0.0
         yPos : Real           init: 0.0
         angle : Real          init: 0.0
@@ -33,6 +33,19 @@ class Car < ActiveObject
                 LineFollowingBehav := new LineFollowingBehavior();
                 insert(self, LineFollowingBehav) into CarBehaviors;
             end
+        setValues(i : CarSnapshot)
+            begin
+                self.executionId:= i.executionId;
+                self.xPos := i.xPos;
+                self.yPos := i.yPos;
+                self.angle := i.angle;
+                self.motor.speed := i.speed;
+                self.motor.isMoving := i.isMoving;
+                self.touch.isPressed := i.bump;
+                self.light.lightValue := i.light;
+                self.sound.distance := i.distance;
+                self.clock.now := i.timestamp;
+            end 
         action()
             begin
                 for b in self.behavior do
@@ -59,9 +72,11 @@ class LineFollowingBehavior < Behavior
         executeBehavior()
             begin
                 declare snap : OutputCarSnapshot, a : Action, i : InputCarSnapshot; 
-                i := InputCarSnapshot.allInstances()->select(s:InputCarSnapshot | s.twinId = self.car.twinId and s.timestamp = InputCarSnapshot.allInstances()->collect(s:InputCarSnapshot |s.timestamp)->min())->any(true);
+                i := InputCarSnapshot.allInstances()->select(s:InputCarSnapshot | 
+                    s.twinId = self.car.twinId and 
+                    s.timestamp = InputCarSnapshot.allInstances()->collect(s:InputCarSnapshot |s.timestamp)->min())->any(true);
                 if i<>null then 
-                    i.setValues(self.car);
+                    self.car.setValues(i);
                     destroy(i);
                     if self.car.light.lightValue <= 40 then
                         self.car.motor.forward();
@@ -167,7 +182,7 @@ end
 abstract class Snapshot
     attributes
         timestamp : Integer
-        executionId : String
+        executionId : Integer
     end
 
 abstract class CarSnapshot < Snapshot
@@ -207,19 +222,5 @@ class OutputCarSnapshot < CarSnapshot
     end
 
 class InputCarSnapshot < CarSnapshot
-    operations
-        setValues(c : Car)
-            begin
-                c.xPos := self.xPos;
-                c.yPos := self.yPos;
-                c.angle := self.angle;
-                c.executionId := self.executionId;
-                c.motor.speed := self.speed;
-                c.motor.isMoving := self.isMoving;
-                c.touch.isPressed := self.bump;
-                c.light.lightValue := self.light;
-                c.sound.distance := self.distance;
-                c.clock.now := self.timestamp;
-            end
     end
 

@@ -19,27 +19,11 @@
         </strategy>
         <hidden>false</hidden>
     </node>
-    <node id="LineFollowingBehavior1" sizeCalculated="true" type="Object">
-        <name>LineFollowingBehavior1</name>
-        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
-            <x>170.626722198189</x>
-            <y>227.63794227066717</y>
-        </strategy>
-        <hidden>false</hidden>
-    </node>
     <node id="UltrasonicSensor1" sizeCalculated="true" type="Object">
         <name>UltrasonicSensor1</name>
         <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
             <x>9.023149445652507</x>
             <y>169.1949866114162</y>
-        </strategy>
-        <hidden>false</hidden>
-    </node>
-    <node id="car" sizeCalculated="true" type="Object">
-        <name>car</name>
-        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
-            <x>226.1650043319196</x>
-            <y>79.3018758194113</y>
         </strategy>
         <hidden>false</hidden>
     </node>
@@ -64,6 +48,118 @@
         <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
             <x>17.373054673025536</x>
             <y>115.84482191666274</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="LineFollowingBehavior1" sizeCalculated="true" type="Object">
+        <name>LineFollowingBehavior1</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>170.626722198189</x>
+            <y>227.63794227066717</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="inNXJCar1627763814" sizeCalculated="true" type="Object">
+        <name>inNXJCar1627763814</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>725.4239594777785</x>
+            <y>12.61031038590545</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="inNXJCar1627763867" sizeCalculated="true" type="Object">
+        <name>inNXJCar1627763867</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>725.763783733925</x>
+            <y>245.07438869926443</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="inNXJCar1627763933" sizeCalculated="true" type="Object">
+        <name>inNXJCar1627763933</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>940.4463398685932</x>
+            <y>479.5894161709483</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="inNXJCar1627763802" sizeCalculated="true" type="Object">
+        <name>inNXJCar1627763802</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>513.7220885031625</x>
+            <y>12.80261605343236</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="inNXJCar1627763906" sizeCalculated="true" type="Object">
+        <name>inNXJCar1627763906</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>509.18193893864714</x>
+            <y>473.63679945541446</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="car" sizeCalculated="true" type="Object">
+        <name>car</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>226.1650043319196</x>
+            <y>79.3018758194113</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="inNXJCar1627763918" sizeCalculated="true" type="Object">
+        <name>inNXJCar1627763918</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>723.0216695867775</x>
+            <y>478.0926186595408</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="inNXJCar1627763838" sizeCalculated="true" type="Object">
+        <name>inNXJCar1627763838</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>1147.974276796304</x>
+            <y>11.24812368217738</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="inNXJCar1627763849" sizeCalculated="true" type="Object">
+        <name>inNXJCar1627763849</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>508.24337827540967</x>
+            <y>241.05717021857538</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="inNXJCar1627763884" sizeCalculated="true" type="Object">
+        <name>inNXJCar1627763884</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>940.8701683019001</x>
+            <y>246.04909805236457</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="inNXJCar1627763822" sizeCalculated="true" type="Object">
+        <name>inNXJCar1627763822</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>938.0874366811859</x>
+            <y>10.875041700289216</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="inNXJCar1627763897" sizeCalculated="true" type="Object">
+        <name>inNXJCar1627763897</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>1155.7995230075007</x>
+            <y>247.274419337886</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="inNXJCar1627763952" sizeCalculated="true" type="Object">
+        <name>inNXJCar1627763952</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>1155.2643361549747</x>
+            <y>477.8344955435557</y>
         </strategy>
         <hidden>false</hidden>
     </node>

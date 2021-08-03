@@ -19,14 +19,6 @@
         </strategy>
         <hidden>false</hidden>
     </node>
-    <node id="LineFollowingBehavior1" sizeCalculated="true" type="Object">
-        <name>LineFollowingBehavior1</name>
-        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
-            <x>170.626722198189</x>
-            <y>227.63794227066717</y>
-        </strategy>
-        <hidden>false</hidden>
-    </node>
     <node id="UltrasonicSensor1" sizeCalculated="true" type="Object">
         <name>UltrasonicSensor1</name>
         <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
@@ -35,11 +27,51 @@
         </strategy>
         <hidden>false</hidden>
     </node>
-    <node id="car" sizeCalculated="true" type="Object">
-        <name>car</name>
+    <node id="OutputCarSnapshot9" sizeCalculated="true" type="Object">
+        <name>OutputCarSnapshot9</name>
         <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
-            <x>226.1650043319196</x>
-            <y>79.3018758194113</y>
+            <x>515.6891697597929</x>
+            <y>479.314123486741</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="OutputCarSnapshot7" sizeCalculated="true" type="Object">
+        <name>OutputCarSnapshot7</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>966.8432454138092</x>
+            <y>250.36094124296676</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="OutputCarSnapshot11" sizeCalculated="true" type="Object">
+        <name>OutputCarSnapshot11</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>961.879100502222</x>
+            <y>484.54061910264716</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="OutputCarSnapshot8" sizeCalculated="true" type="Object">
+        <name>OutputCarSnapshot8</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>1185.729935467108</x>
+            <y>247.62114106393165</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="OutputCarSnapshot10" sizeCalculated="true" type="Object">
+        <name>OutputCarSnapshot10</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>735.9825669458376</x>
+            <y>478.61288272688876</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="OutputCarSnapshot12" sizeCalculated="true" type="Object">
+        <name>OutputCarSnapshot12</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>1191.6741281211266</x>
+            <y>482.33625479932925</y>
         </strategy>
         <hidden>false</hidden>
     </node>
@@ -64,6 +96,70 @@
         <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
             <x>17.373054673025536</x>
             <y>115.84482191666274</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="LineFollowingBehavior1" sizeCalculated="true" type="Object">
+        <name>LineFollowingBehavior1</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>170.626722198189</x>
+            <y>227.63794227066717</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="car" sizeCalculated="true" type="Object">
+        <name>car</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>226.1650043319196</x>
+            <y>79.3018758194113</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="OutputCarSnapshot5" sizeCalculated="true" type="Object">
+        <name>OutputCarSnapshot5</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>520.1141615314732</x>
+            <y>246.53548584596115</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="OutputCarSnapshot6" sizeCalculated="true" type="Object">
+        <name>OutputCarSnapshot6</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>744.9613168321368</x>
+            <y>248.3718368442539</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="OutputCarSnapshot3" sizeCalculated="true" type="Object">
+        <name>OutputCarSnapshot3</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>966.2057855144819</x>
+            <y>18.14436744629529</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="OutputCarSnapshot4" sizeCalculated="true" type="Object">
+        <name>OutputCarSnapshot4</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>1188.8123369731593</x>
+            <y>12.68648075681358</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="OutputCarSnapshot1" sizeCalculated="true" type="Object">
+        <name>OutputCarSnapshot1</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>519.1537466670834</x>
+            <y>11.666062493252298</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="OutputCarSnapshot2" sizeCalculated="true" type="Object">
+        <name>OutputCarSnapshot2</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>744.2281213915255</x>
+            <y>15.482705631827457</y>
         </strategy>
         <hidden>false</hidden>
     </node>

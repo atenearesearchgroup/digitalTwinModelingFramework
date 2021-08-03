@@ -2,5 +2,6 @@ reset
 !new Clock('clock');
 !new Car('car');
 !car.init();
-!car.motor.speed:=31.28
+!car.executionId := 1627763802
+!car.twinId := 'NXJCar'
 !insert(clock, car) into Timing;
