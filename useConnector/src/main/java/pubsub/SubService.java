@@ -16,12 +16,22 @@ public class SubService implements Runnable {
 	private JedisPool jedisPool;
 	private String subscribedChannel;
 	
+	/**
+	 * Default constructor
+	 * 
+	 * @param api			USE system API instance to interact with the currently displayed object diagram.
+	 * @param jedisPool		Jedis client pool, connected to the Data Lake
+	 * @param channel		Channel you want to subscribe to
+	 */
 	public SubService(UseSystemApi api, JedisPool jedisPool, String channel) {
 		this.api = api;
 		this.jedisPool = jedisPool;
 		this.subscribedChannel = channel;
 	}
 
+	/**
+	 * It subscribes to the publisher channel specified in the constructor. 
+	 */
 	public void run() {
         try {
         	System.out.println("[INFO] Subscribing to " + this.subscribedChannel);

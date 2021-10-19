@@ -17,8 +17,10 @@ import redis.clients.jedis.JedisPoolConfig;
 
 /**
  * 
- * @author Paula Muñoz - University of Malaga
+ * @author Paula Mu&ntilde;oz - University of M&atilde;laga
  * 
+ * Plugin's main class
+ *  
  */
 public class DigitalTwinConnectorPlugin implements IPluginActionDelegate {
 	
@@ -41,6 +43,8 @@ public class DigitalTwinConnectorPlugin implements IPluginActionDelegate {
 
 	/**
 	 * This is the Action Method called from the Action Proxy
+	 * 
+	 * @param pluginAction		This is the reference to the current USE running instance.
 	 */
 	public void performAction(IPluginAction pluginAction) {
 		if(!shutDown) {
@@ -72,7 +76,10 @@ public class DigitalTwinConnectorPlugin implements IPluginActionDelegate {
 		}
 	   	    
 	}
-	            
+	
+	/**
+	 * It checks that the connection with the Data Lake works properly.
+	 */
 	private void checkConnectionWithDatabase() {
 		try {
 			Jedis jedis = jedisPool.getResource();

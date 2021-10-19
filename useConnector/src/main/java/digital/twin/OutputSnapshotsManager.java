@@ -16,7 +16,7 @@ import redis.clients.jedis.Jedis;
 
 /**
  * 
- * @author Paula Muñoz - University of Malaga
+ * @author Paula Mu&ntilde;oz - University of M&atilde;laga
  * 
  */
 public class OutputSnapshotsManager {
@@ -28,6 +28,10 @@ public class OutputSnapshotsManager {
 	private final String BOOLEAN = "boolean";
 	private final String PROCESSED_SN_DT = "processedSnapsDT";
 
+	/**
+	 * It sets the type of the attributes in a HashMap to parse the attributes for the Data Lake.
+	 * For example, Booleans will turn into 0 or 1; Numbers will be transformed into Floats.
+	 */
 	public OutputSnapshotsManager() {
 		this.attributes = new HashMap<>();
 
@@ -48,6 +52,12 @@ public class OutputSnapshotsManager {
 		attributes.put("action", STRING);
 	}
 
+	/**
+	 * It retrieves the OutputCarSnapshot objects from the currently displayed object diagram.
+	 * 
+	 * @param api		USE system API instance to interact with the currently displayed object diagram.
+	 * @return			The list of OutputCarSnapshots available in the currently displayed object diagram.
+	 */
 	public static List<MObjectState> getSnapshots(UseSystemApi api) {
 		List<MObjectState> snapshots = new ArrayList<MObjectState>();
 
@@ -63,8 +73,17 @@ public class OutputSnapshotsManager {
 		return snapshots;
 	}
 
-	public void saveSnapshots(UseSystemApi api, Jedis jedis, List<MObjectState> snapshots) throws UseApiException {
-		for (MObjectState snapshot : snapshots) {
+	/**
+	 * It saves all the OutputCarSnapshots object in the currently displayed object diagram in the data lake. 
+	 * Then, it removes them from the diagram.
+	 * 
+	 * @param api				USE system API instance to interact with the currently displayed object diagram.
+	 * @param jedis				An instance of the Jedis client to access the data lake.
+	 * @throws UseApiException
+	 */
+	public void saveSnapshots(UseSystemApi api, Jedis jedis) throws UseApiException {
+		List<MObjectState> outputSnapshots = OutputSnapshotsManager.getSnapshots(api);
+		for (MObjectState snapshot : outputSnapshots) {
 			Map<String, String> carValues = new HashMap<>();
 			Map<MAttribute, Value> snapshotAttributes = snapshot.attributeValueMap();
 
@@ -74,7 +93,14 @@ public class OutputSnapshotsManager {
 			carValues.put(SNAPSHOT_ID, snapshotId);
 
 			for (String att : this.attributes.keySet()) {
-				processAttribute(this.attributes, snapshotAttributes, carValues, att, snapshotId, jedis);
+				String attributeValue = getAttribute(snapshotAttributes, att);
+				System.out.println("[INFO-DT-Output] " + att + ": " + attributeValue);
+				carValues.put(att, attributeValue);
+				if (attributes.get(att).equals(NUMBER)) {
+					addSearchRegister(att, Double.parseDouble(attributeValue.replace("'", "")), snapshotId, jedis);
+				} else if (attributes.get(att).equals(BOOLEAN)) {
+					addSearchRegister(att, Boolean.parseBoolean(attributeValue)?1:0, snapshotId, jedis);
+				}
 			}
 
 			jedis.hset(snapshotId, carValues);
@@ -84,23 +110,25 @@ public class OutputSnapshotsManager {
 		}
 	}
 
-	private void processAttribute(Map<String, String> attributes, Map<MAttribute, Value> snapshotAttributes,
-			Map<String, String> carValues, String attributeKey, String snapshotId, Jedis jedis) {
-		String attributeValue = getAttribute(snapshotAttributes, attributeKey);
-		System.out.println("[INFO-DT-Output] " + attributeKey + ": " + attributeValue);
-		carValues.put(attributeKey, attributeValue);
-		if (attributes.get(attributeKey).equals(NUMBER)) {
-			addSearchRegister(attributeKey, Double.parseDouble(attributeValue.replace("'", "")), snapshotId, jedis);
-		} else if (attributes.get(attributeKey).equals(BOOLEAN)) {
-			addSearchRegister(attributeKey, Boolean.parseBoolean(attributeValue)?1:0, snapshotId, jedis);
-		}
-		
-	}
-
+	/**
+	 * This method is equivalent to the redis command <i>ZADD DT_sensorKey_LIST score registryKey</i>
+	 * 
+	 * @param sensorKey			Sensor identifier.
+	 * @param score				Value of the sensor readings.
+	 * @param registryKey		Snapshot Id
+	 * @param jedis				An instance of the Jedis client to access the data lake.
+	 */
 	private void addSearchRegister(String sensorKey, double score, String registryKey, Jedis jedis) {
 		jedis.zadd("DT_" + sensorKey + "_LIST", score, registryKey);
 	}
 
+	/**
+	 * It retrieves an attribute with the name <i>attributeName</i> from a Map of attributes and values.
+	 * 
+	 * @param attributes 		Map with the attributes and its values.
+	 * @param attributeName		Name of the attribute whose value is retrieved.
+	 * @return
+	 */
 	private String getAttribute(Map<MAttribute, Value> attributes, String attributeName) {
 		for (MAttribute snapshotKey : attributes.keySet()) {
 			if (snapshotKey.name().equals(attributeName)) {

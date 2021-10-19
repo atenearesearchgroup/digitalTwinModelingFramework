@@ -12,20 +12,36 @@ import redis.clients.jedis.Jedis;
 
 /**
  * 
- * @author Paula Muñoz - University of Malaga
- * 
+ * @author Paula Mu&ntilde;oz - University of M&atilde;laga
+ *
  */
 public class InputSnapshotsManager {
 	
 	private final static String PROCESSING_QUEUE_LIST = "processingQueueList";
 
+	/**
+	 * Method to retrieve the list of unprocessed input snapshots from the database. 
+	 * This method is equivalent to the query <i>ZRANGEBYLEX processingQueueList [0 (1</i>
+	 * 
+	 * @param jedis		An instance of the Jedis client to access the data lake.
+	 * @return 			Returns the list of unprocessed snapshots stored in the Data Lake
+	 */
 	public static Set<String> getUnprocessedSnapshots(Jedis jedis) {
 		Set<String> snapshots = jedis.zrangeByLex(PROCESSING_QUEUE_LIST, "[0", "(1");
 		return snapshots;
 	}
 
-	public static void saveSnapshots(UseSystemApi api, Jedis jedis, Set<String> snapshots) throws UseApiException {
-		for (String snapshot : snapshots) {
+	/**
+	 * Method to process a set of input snapshots. It creates the corresponding snapshot objects on USE
+	 * so that they are processed.
+	 * 
+	 * @param api				USE system API instance to interact with the currently displayed object diagram.
+	 * @param jedis				An instance of the Jedis client to access the data lake.
+	 * @throws UseApiException	
+	 */
+	public static void saveSnapshots(UseSystemApi api, Jedis jedis) throws UseApiException {
+		Set<String> unprocessedSnapshots = InputSnapshotsManager.getUnprocessedSnapshots(jedis);
+		for (String snapshot : unprocessedSnapshots) {
 			String snapshotId = snapshot.substring(2, snapshot.length());
 			Map<String, String> values = jedis.hgetAll(snapshotId);
 			
@@ -49,6 +65,13 @@ public class InputSnapshotsManager {
 		}
 	}
 	
+	/**
+	 * Method to transform Strings stored in the database into valid OCL expressions for USE. 
+	 * 
+	 * @param type 		Type of the parameter retrieved from the database.
+	 * @param value		Value of the parameter retrieved.
+	 * @return			A String valid for USE.
+	 */
 	private static String setOCLExpression(Type type, String value) {
 		if(type.isTypeOfReal() && !value.contains(".")) {			
 			value += ".0";

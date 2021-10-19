@@ -8,7 +8,7 @@ import redis.clients.jedis.JedisPool;
 
 /**
  * 
- * @author Paula Muñoz - University of Malaga
+ * @author Paula Mu&ntilde;oz - University of M&atilde;laga
  * 
  */
 public class InPubService implements Runnable {
@@ -17,15 +17,25 @@ public class InPubService implements Runnable {
 	private int sleepTime;
 	private boolean running;
 	
+	/**
+	 * Default constructor
+	 * 
+	 * @param api			USE system API instance to interact with the currently displayed object diagram.
+	 * @param jedisPool		Jedis client pool, connected to the Data Lake
+	 * @param sleepTime		Milliseconds between each check in the database.
+	 */
 	public InPubService(UseSystemApi api, JedisPool jedisPool, int sleepTime) {
 		this.jedisPool = jedisPool;
 		this.sleepTime = sleepTime;
 		this.running = true;
 	}
 	
+	/**
+	 * It checks periodically if there are new unprocessed snapshots coming from the Physical Twin in the Data Lake.
+	 */
 	public void run() {
         while(running){
-        	// Wait some seconds until it checks again
+        	// Wait some milliseconds until it checks again
             try {
                 Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
@@ -50,6 +60,9 @@ public class InPubService implements Runnable {
         }
     }
 	
+	/**
+	 * It stops the periodic search for new snapshots.
+	 */
 	public void stop() {
 		this.running = false;
 	}
