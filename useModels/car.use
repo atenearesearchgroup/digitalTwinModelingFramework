@@ -224,3 +224,26 @@ class OutputCarSnapshot < CarSnapshot
 class InputCarSnapshot < CarSnapshot
     end
 
+------- COMMANDS
+
+class CommandController < ActiveObject
+    operations
+        action()
+            begin
+            end
+    end
+
+class Command
+    attributes 
+        id : Integer
+        action : Action
+        digitalProcessed : Boolean      init : false
+        physicalSent : Boolean          init : false
+        physicalProcessed : Boolean     init : false
+        correct : Boolean               init : true
+    end
+
+association Control between 
+    Command [*] role command
+    CommandController [1] role controller
+    end
