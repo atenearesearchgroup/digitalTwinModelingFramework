@@ -18,7 +18,7 @@ import lejos.util.PilotProps;
 
 /**
  * 
- * @author Paula Muñoz - University of Malaga
+ * @author Paula Mu&ntilde;oz - University of M&atilde;laga
  * 
  */
 public abstract class Car {

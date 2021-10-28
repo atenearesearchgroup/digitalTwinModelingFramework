@@ -6,7 +6,7 @@ import lejos.robotics.subsumption.Behavior;
 
 /**
  * 
- * @author Paula Muñoz - University of Malaga
+ * @author Paula Mu&ntilde;oz - University of M&atilde;laga
  * 
  */
 public class LineFollowerCar extends Car {
@@ -15,12 +15,20 @@ public class LineFollowerCar extends Car {
 	private final String OFF_LINE = "Rotate";
 	
 
+	/**
+	 * Default constructor
+	 * @throws IOException
+	 */
 	public LineFollowerCar() throws IOException {
 		super();
 		this.setBehaviors(new Behavior[]{this.offLine(), this.driveForward()});
 		setActiveBehavior(DRIVE_FORWARD);
 	}
-
+	
+	/**
+	 * The car moves forward while the light sensor detects a dark line on the floor.
+	 * @return
+	 */
 	public Behavior driveForward() {
 		Behavior driveForward = new Behavior() {
 			public boolean takeControl() {
@@ -41,6 +49,10 @@ public class LineFollowerCar extends Car {
 		return driveForward;
 	}
 	
+	/**
+	 * The car starts spinning while it does not detect the black line on the floow
+	 * @return
+	 */
 	public Behavior offLine() {
 		Behavior offLine = new Behavior() {
 			private boolean suppress = false;

@@ -16,7 +16,7 @@ import redis.clients.jedis.JedisPool;
 
 /**
  * 
- * @author Paula Muñoz - University of Malaga
+ * @author Paula Mu&ntilde;oz - University of M&atilde;laga
  * 
  */
 public class SensorReceiver implements Runnable {
@@ -34,6 +34,14 @@ public class SensorReceiver implements Runnable {
 	private int port;
 	private boolean running;
 
+	/**
+	 * Default constructor
+	 * 
+	 * @param jedisPool		Jedis client pool, connected to the Data Lake
+	 * @param port			Port to deploy the server socket
+	 * @throws UnknownHostException
+	 * @throws IOException
+	 */
 	public SensorReceiver(JedisPool jedisPool, int port) throws UnknownHostException, IOException {
 		this.jedisPool = jedisPool;
 		this.running = true;
@@ -60,6 +68,9 @@ public class SensorReceiver implements Runnable {
 		attributes.put("action", STRING);
 	}
 
+	/**
+	 * This method runs in the background, receiving information from the Physical Twin and storing it into the Data Lake.
+	 */
 	public void run() {
 		Jedis jedis = jedisPool.getResource();
 		while (running) {
@@ -109,7 +120,11 @@ public class SensorReceiver implements Runnable {
 	private void addSearchRegister(String sensorKey, double score, String registryKey, Jedis jedis) {
 		jedis.zadd(sensorKey.toUpperCase() + "_LIST", score, registryKey);
 	}
-
+	
+	/**
+	 * This method stops the reception of information from the Physical Twin.
+	 * @throws IOException
+	 */
 	public void stop() throws IOException {
 		this.running = false;
 		this.server.close();

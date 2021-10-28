@@ -11,7 +11,7 @@ import reporter.SensorReporter;
 
 /**
  * 
- * @author Paula Muñoz - University of Malaga
+ * @author Paula Mu&ntilde;oz - University of M&atilde;laga
  * 
  */
 public class CarMain {

@@ -10,17 +10,24 @@ import lejos.pc.comm.NXTConnector;
 
 /**
  * 
- * @author Paula Muñoz - University of Malaga
+ * @author Paula Mu&ntilde;oz - University of M&atilde;laga
  * 
  */
 public class BluetoothConnector {
 
 	NXTConnector conn;
 
+	/**
+	 * Default constructor
+	 */
 	public BluetoothConnector() {
 		this.conn = new NXTConnector();
 	}
-
+	
+	
+	/**
+	 * It starts the bluetooth connection between the Lego Car and the computer
+	 */
 	public void openConnection() {
 		this.conn.addLogListener(new NXTCommLogListener() {
 			@Override
@@ -43,6 +50,9 @@ public class BluetoothConnector {
 		NXTCommandConnector.setNXTCommand(new NXTCommand(conn.getNXTComm()));
 	}
 
+	/**
+	 * It closes the bluetooth connection between the Lego Car and the computer
+	 */
 	public void closeConnection() {
 		try {
 			this.conn.close();

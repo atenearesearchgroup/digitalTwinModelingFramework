@@ -12,7 +12,7 @@ import redis.clients.jedis.JedisPoolConfig;
 
 /**
  * 
- * @author Paula Muñoz - University of Malaga
+ * @author Paula Mu&ntilde;oz - University of M&atilde;laga
  * 
  */
 public class ConnectorMain {
