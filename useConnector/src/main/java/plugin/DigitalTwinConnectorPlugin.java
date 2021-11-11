@@ -44,7 +44,7 @@ public class DigitalTwinConnectorPlugin implements IPluginActionDelegate {
 		this.snapshotsProducer = Executors.newSingleThreadExecutor();
 		this.commandsProducer = Executors.newSingleThreadExecutor();
 		this.snapshotsProcessor = Executors.newSingleThreadExecutor();
-		this.shutDown = false;
+		this.shutDown = true;
 	}
 
 	/**
@@ -58,7 +58,6 @@ public class DigitalTwinConnectorPlugin implements IPluginActionDelegate {
 			jedisPool = new JedisPool(new JedisPoolConfig(), "localhost");
 
 			checkConnectionWithDatabase();
-			
 			this.outPublisher = new OutPubService(DTPubSub.DT_OUT_CHANNEL, api, jedisPool, 5000, new OutputSnapshotsManager());
 			this.commandOutPublisher = new OutPubService(DTPubSub.COMMAND_OUT_CHANNEL, api, jedisPool, 5000, new CommandsManager());
 			this.inPublisher = new InPubService(DTPubSub.DT_IN_CHANNEL, api, jedisPool, 5000);

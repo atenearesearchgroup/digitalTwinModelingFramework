@@ -20,6 +20,8 @@ import redis.clients.jedis.Jedis;
 
 public class CommandsManager extends OutputManager{
 	
+	private final String COMMANDS_LIST = "commands";
+	
 	public CommandsManager() {
 		this.retrievedClass = "Command";
 		this.setChannel("CommandOutChannel");
@@ -62,6 +64,7 @@ public class CommandsManager extends OutputManager{
 			}
 
 			jedis.hset(commandId, commandsValues);
+			jedis.zadd(COMMANDS_LIST, 0, commandId);
 			
 			api.deleteObjectEx(command.object());
 		}
