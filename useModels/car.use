@@ -231,6 +231,7 @@ class Command
         twinId : String
         timestamp : Integer
         executionId : Integer
+        action : Actions
     constraints    
         inv noPhysicalTwinConnection:
             not((Car.allInstances()->select(c:Car|c.twinId = self.twinId)->any(true)).oclIsUndefined())
