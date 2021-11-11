@@ -231,7 +231,16 @@ class Command
         twinId : String
         timestamp : Integer
         executionId : Integer
-        action : Actions
+        action : Action
+    operations
+        initialize()
+            begin
+                declare c: Car;
+                c:= Car.allInstances()->select(c:Car|c.twinId = self.twinId)->any(true);
+                self.timestamp := c.clock.now;
+                self.executionId := c.executionId;
+            end
+            pre: not(self.twinId.oclIsUndefined())
     constraints    
         inv noPhysicalTwinConnection:
             not((Car.allInstances()->select(c:Car|c.twinId = self.twinId)->any(true)).oclIsUndefined())
