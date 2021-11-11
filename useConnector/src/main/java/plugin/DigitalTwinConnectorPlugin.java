@@ -7,7 +7,10 @@ import org.tzi.use.api.UseSystemApi;
 import org.tzi.use.runtime.gui.IPluginAction;
 import org.tzi.use.runtime.gui.IPluginActionDelegate;
 
+import digital.twin.CommandsManager;
+import digital.twin.OutputSnapshotsManager;
 import pubsub.OutPubService;
+import pubsub.PubService;
 import pubsub.DTPubSub;
 import pubsub.InPubService;
 import pubsub.SubService;
@@ -28,8 +31,10 @@ public class DigitalTwinConnectorPlugin implements IPluginActionDelegate {
 	private JedisPool jedisPool;
 	private ExecutorService snapshotsProducer;
 	private ExecutorService snapshotsProcessor;
+	private ExecutorService commandsProducer;
 	private boolean shutDown;
 	private OutPubService outPublisher;
+	private OutPubService commandOutPublisher;
 	private InPubService inPublisher;
 	
 	/**
@@ -37,6 +42,7 @@ public class DigitalTwinConnectorPlugin implements IPluginActionDelegate {
 	 */
 	public DigitalTwinConnectorPlugin() {
 		this.snapshotsProducer = Executors.newSingleThreadExecutor();
+		this.commandsProducer = Executors.newSingleThreadExecutor();
 		this.snapshotsProcessor = Executors.newSingleThreadExecutor();
 		this.shutDown = false;
 	}
@@ -47,34 +53,41 @@ public class DigitalTwinConnectorPlugin implements IPluginActionDelegate {
 	 * @param pluginAction		This is the reference to the current USE running instance.
 	 */
 	public void performAction(IPluginAction pluginAction) {
-		if(!shutDown) {
-			if(snapshotsProducer.isShutdown()) {
-				snapshotsProducer = Executors.newSingleThreadExecutor();
-			}
-			if(snapshotsProcessor.isShutdown()) {
-				snapshotsProcessor = Executors.newSingleThreadExecutor();
-			}
+		if(shutDown) {
 			api = UseSystemApi.create(pluginAction.getSession());
 			jedisPool = new JedisPool(new JedisPoolConfig(), "localhost");
 
 			checkConnectionWithDatabase();
 			
-			this.outPublisher = new OutPubService(api, jedisPool, 5000);
-			this.inPublisher = new InPubService(api, jedisPool, 5000);
-			snapshotsProducer.submit(outPublisher);
-			snapshotsProcessor.submit(inPublisher);
-			shutDown = true;
-			new Thread(new SubService(api, jedisPool, DTPubSub.DT_OUT_CHANNEL), "subscriber OUTPUT thread").start();
-			new Thread(new SubService(api, jedisPool, DTPubSub.DT_IN_CHANNEL), "subscriber INPUT thread").start();
-		} else {
-			snapshotsProducer.shutdown();
-			snapshotsProcessor.shutdown();
-			outPublisher.stop();
-			inPublisher.stop();
+			this.outPublisher = new OutPubService(DTPubSub.DT_OUT_CHANNEL, api, jedisPool, 5000, new OutputSnapshotsManager());
+			this.commandOutPublisher = new OutPubService(DTPubSub.COMMAND_OUT_CHANNEL, api, jedisPool, 5000, new CommandsManager());
+			this.inPublisher = new InPubService(DTPubSub.DT_IN_CHANNEL, api, jedisPool, 5000);
+			
+			startInformationExchange(outPublisher, snapshotsProducer, DTPubSub.DT_OUT_CHANNEL);
+			startInformationExchange(commandOutPublisher, commandsProducer, DTPubSub.COMMAND_OUT_CHANNEL);
+			startInformationExchange(inPublisher, snapshotsProcessor, DTPubSub.DT_IN_CHANNEL);
 			shutDown = false;
+		} else {
+			stopInformationExchange(outPublisher, snapshotsProducer);
+			stopInformationExchange(commandOutPublisher, commandsProducer);
+			stopInformationExchange(inPublisher, snapshotsProcessor);
+			shutDown = true;
 			System.out.println("[INFO-DT] Connection ended successfully");
 		}
 	   	    
+	}
+	
+	private void startInformationExchange(PubService pubService, ExecutorService executor, String channel) {
+		if(executor.isShutdown()) {
+			executor = Executors.newSingleThreadExecutor();
+		}
+		executor.submit(pubService);
+		new Thread(new SubService(api, jedisPool, channel), "subscriber " + channel + " thread").start();
+	}
+	
+	private void stopInformationExchange(PubService pubService, ExecutorService executor) {
+		executor.shutdown();
+		pubService.stop();
 	}
 	
 	/**

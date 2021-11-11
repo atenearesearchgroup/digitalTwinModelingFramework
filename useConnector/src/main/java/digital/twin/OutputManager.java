@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.tzi.use.api.UseApiException;
 import org.tzi.use.api.UseSystemApi;
 import org.tzi.use.uml.mm.MAttribute;
 import org.tzi.use.uml.mm.MClass;
@@ -22,6 +23,8 @@ public abstract class OutputManager {
 	protected final String NUMBER = "double";
 	protected final String BOOLEAN = "boolean";
 	
+	private String channel;
+	
 	public OutputManager() {
 		this.attributes = new HashMap<>();
 	}
@@ -32,7 +35,7 @@ public abstract class OutputManager {
 	 * @param api		USE system API instance to interact with the currently displayed object diagram.
 	 * @return			The list of OutputCarSnapshots available in the currently displayed object diagram.
 	 */
-	public List<MObjectState> getSnapshots(UseSystemApi api) {
+	public List<MObjectState> getObjects(UseSystemApi api) {
 		List<MObjectState> snapshots = new ArrayList<MObjectState>();
 
 		MClass snapshotClass = api.getSystem().model().getClass(this.retrievedClass);
@@ -46,6 +49,8 @@ public abstract class OutputManager {
 
 		return snapshots;
 	}
+	
+	public abstract void saveObjects(UseSystemApi api, Jedis jedis) throws UseApiException;
 	
 	/**
 	 * This method is equivalent to the redis command <i>ZADD DT_sensorKey_LIST score registryKey</i>
@@ -73,5 +78,13 @@ public abstract class OutputManager {
 			}
 		}
 		return null;
+	}
+
+	public String getChannel() {
+		return channel;
+	}
+
+	public void setChannel(String channel) {
+		this.channel = channel;
 	}
 }

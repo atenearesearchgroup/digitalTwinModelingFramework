@@ -26,6 +26,7 @@ public class OutputSnapshotsManager extends OutputManager {
 	 */
 	public OutputSnapshotsManager() {
 		super();
+		this.setChannel("DTOutChannel");
 		this.retrievedClass = "OutputCarSnapshot";
 		
 		attributes.put("twinId", STRING);
@@ -53,8 +54,8 @@ public class OutputSnapshotsManager extends OutputManager {
 	 * @param jedis				An instance of the Jedis client to access the data lake.
 	 * @throws UseApiException
 	 */
-	public void saveSnapshots(UseSystemApi api, Jedis jedis) throws UseApiException {
-		List<MObjectState> outputSnapshots = this.getSnapshots(api);
+	public void saveObjects(UseSystemApi api, Jedis jedis) throws UseApiException {
+		List<MObjectState> outputSnapshots = this.getObjects(api);
 		for (MObjectState snapshot : outputSnapshots) {
 			Map<String, String> carValues = new HashMap<>();
 			Map<MAttribute, Value> snapshotAttributes = snapshot.attributeValueMap();

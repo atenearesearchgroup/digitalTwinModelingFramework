@@ -22,6 +22,7 @@ public class CommandsManager extends OutputManager{
 	
 	public CommandsManager() {
 		this.retrievedClass = "Command";
+		this.setChannel("CommandOutChannel");
 		
 		attributes.put("twinId", STRING);
 		attributes.put("timestamp", NUMBER);
@@ -37,8 +38,8 @@ public class CommandsManager extends OutputManager{
 	 * @param jedis				An instance of the Jedis client to access the data lake.
 	 * @throws UseApiException
 	 */
-	public void saveSnapshots(UseSystemApi api, Jedis jedis) throws UseApiException {
-		List<MObjectState> unprocessedCommands = this.getSnapshots(api);
+	public void saveObjects(UseSystemApi api, Jedis jedis) throws UseApiException {
+		List<MObjectState> unprocessedCommands = this.getObjects(api);
 		for (MObjectState command : unprocessedCommands) {
 			Map<String, String> commandsValues = new HashMap<>();
 			Map<MAttribute, Value> commandsAttributes = command.attributeValueMap();
