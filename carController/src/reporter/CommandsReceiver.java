@@ -18,6 +18,8 @@ public class CommandsReceiver implements Runnable {
 	public CommandsReceiver(int port, Car c) throws IOException {
 		this.port = port;
 		this.server = new ServerSocket(this.port);
+		this.running = true;
+		this.c = c;
 	}
 	
 	
@@ -27,11 +29,10 @@ public class CommandsReceiver implements Runnable {
 				Socket connection = server.accept();
 				System.out.println("[INFO-PT] THE CAR IS RECEIVING COMMANDS");
 				BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-				
 				while(running) {
 					String message = inFromClient.readLine();
-					System.out.println("[INFO-PT]" + message);
-					c.execute(message);
+					System.out.println("[INFO-PT] " + message);
+					c.addToQueue(message);
 				}
 				connection.close();
 			} catch(Exception e) {

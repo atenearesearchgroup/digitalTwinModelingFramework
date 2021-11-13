@@ -1,10 +1,10 @@
 package car;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import lejos.nxt.Button;
 import lejos.nxt.LCD;
 import lejos.nxt.LightSensor;
 import lejos.nxt.SensorPort;
@@ -71,16 +71,23 @@ public abstract class Car {
 
 	public void startBehaving() {
 		LCD.drawString("Line ", 0, 1);
-		Button.waitForAnyPress();
 		(new Arbitrator(getBehaviors())).start();
 	}
 
-	public void execute(String command) {
+	public void addToQueue(String command) {
 		commands.add(command);
 	}
 
+	public void execute() {
+		commands.remove(0);
+	}
+	
 	public boolean commandsIsEmpty() {
 		return this.commands.isEmpty();
+	}
+	
+	public List<String> commands(){
+		return Collections.unmodifiableList(this.commands);
 	}
 
 	public LightSensor getLight() {

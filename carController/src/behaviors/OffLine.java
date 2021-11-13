@@ -7,7 +7,7 @@ public class OffLine extends CarBehavior {
 	private boolean suppress = false;
 	
 	public OffLine(Car c) {
-		super("OffLine", c);
+		super("Rotate", c);
 	}
 
 	public boolean takeControl() {

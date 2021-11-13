@@ -1,19 +1,12 @@
 package behaviors;
 
-import java.util.Iterator;
-import java.util.List;
-
 import car.Car;
+import lejos.robotics.subsumption.Behavior;
 
 public class RemoteControl extends CarBehavior{	
-
-	private List<CarBehavior> behaviors;
-	private List<String> commands;
 	
-	public RemoteControl(Car c, List<CarBehavior> behaviors, List<String> commands) {
+	public RemoteControl(Car c) {
 		super("Command", c);
-		this.behaviors = behaviors;
-		this.commands = commands;
 	}
 
 	public boolean takeControl() {
@@ -26,13 +19,13 @@ public class RemoteControl extends CarBehavior{
 
 	public void action() {
 		super.action();
-		while(!c.commandsIsEmpty()) {
-			Iterator<CarBehavior> it = behaviors.iterator();
-			while(it.hasNext()) {
-				CarBehavior b = it.next();
-				if(b.getACTION().equals(commands.get(0))) {
-					b.action();
-					commands.remove(0);
+		while(!c.commandsIsEmpty()) {;
+			for(Behavior b : c.getBehaviors()) {
+				CarBehavior cb = (CarBehavior) b;;
+				if(("Action::" + cb.getACTION()).equals(c.commands().get(0))) {
+					System.out.println("[INFO-PT] Performing action => " + cb.getACTION());
+					cb.action();
+					c.execute();
 					break;
 				}
 			}
