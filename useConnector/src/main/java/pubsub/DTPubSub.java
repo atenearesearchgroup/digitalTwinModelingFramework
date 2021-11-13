@@ -3,7 +3,6 @@ package pubsub;
 import org.tzi.use.api.UseApiException;
 import org.tzi.use.api.UseSystemApi;
 
-import digital.twin.CommandsManager;
 import digital.twin.InputSnapshotsManager;
 import digital.twin.OutputSnapshotsManager;
 import redis.clients.jedis.Jedis;
@@ -18,13 +17,10 @@ public class DTPubSub extends JedisPubSub {
 
 	private UseSystemApi api;
 	private Jedis jedis;
-	private OutputSnapshotsManager dTOutSnapshotsManager;
-	private CommandsManager commandsManager;
+	private OutputSnapshotsManager snapshotsManager;
 
 	public static final String DT_OUT_CHANNEL = "DTOutChannel";
 	public static final String DT_IN_CHANNEL = "DTInChannel";
-	public static final String COMMAND_OUT_CHANNEL = "CommandOutChannel";
-	public static final String COMMAND_IN_CHANNEL = "CommandInChannel";
 
 	/**
 	 * Default constructor
@@ -35,8 +31,7 @@ public class DTPubSub extends JedisPubSub {
 	public DTPubSub(UseSystemApi api, Jedis jedis) {
 		this.api = api;
 		this.jedis = jedis;
-		this.dTOutSnapshotsManager = new OutputSnapshotsManager();
-		this.commandsManager = new CommandsManager();
+		this.snapshotsManager = new OutputSnapshotsManager();
 	}
 
 	/**
@@ -58,23 +53,8 @@ public class DTPubSub extends JedisPubSub {
 			break;
 		case DT_OUT_CHANNEL: // Info leaving USE
 			try {
-				this.dTOutSnapshotsManager.saveObjects(api, jedis);
+				this.snapshotsManager.saveSnapshots(api, jedis);
 				System.out.println("[INFO-DT] New Output Snapshots saved");
-			} catch (UseApiException e) {
-				e.printStackTrace();
-			}
-			break;
-//		case COMMAND_IN_CHANNEL:
-//			try {
-// 				// TODO
-//			} catch (UseApiException e) {
-//				e.printStackTrace();
-//			}
-//			break;
-		case COMMAND_OUT_CHANNEL:
-			try {
-				this.commandsManager.saveObjects(api, jedis);
-				System.out.println("[INFO-DT] New Commands saved");
 			} catch (UseApiException e) {
 				e.printStackTrace();
 			}
