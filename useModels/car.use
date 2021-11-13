@@ -7,7 +7,7 @@ enum Action {Forward, Rotate}
 class Car < ActiveObject
     attributes
         twinId : String       init: 'NXJCar'
-        executionId : Integer  -- init: 1627484055
+        executionId : Integer  init: 1627484055
         xPos : Real           init: 0.0
         yPos : Real           init: 0.0
         angle : Real          init: 0.0
@@ -35,7 +35,7 @@ class Car < ActiveObject
             end
         setValues(i : CarSnapshot)
             begin
-                self.executionId := i.executionId;
+                self.executionId:= i.executionId;
                 self.xPos := i.xPos;
                 self.yPos := i.yPos;
                 self.angle := i.angle;
@@ -72,9 +72,9 @@ class LineFollowingBehavior < Behavior
         executeBehavior()
             begin
                 declare snap : OutputCarSnapshot, a : Action, i : InputCarSnapshot; 
-                i := InputCarSnapshot.allInstances() -> select(s: InputCarSnapshot | 
+                i := InputCarSnapshot.allInstances()->select(s:InputCarSnapshot | 
                     s.twinId = self.car.twinId and 
-                    s.timestamp = InputCarSnapshot.allInstances() -> collect(s: InputCarSnapshot |s.timestamp) -> min()) -> any(true);
+                    s.timestamp = InputCarSnapshot.allInstances()->collect(s:InputCarSnapshot |s.timestamp)->min())->any(true);
                 if i<>null then 
                     self.car.setValues(i);
                     destroy(i);
@@ -103,12 +103,12 @@ class TouchSensor
 
 class LightSensor
     attributes 
-        lightValue : Integer    init: 45
+        lightValue : Integer    init:45
     end
 
 class UltrasonicSensor
     attributes
-        distance : Integer      init: 40 -- cm
+        distance : Integer      init:40 -- cm
     end
 
 class Motor
@@ -121,7 +121,7 @@ class Motor
                 self.car.xPos := self.car.xPos + self.speed*self.car.clock.tickTime*self.car.angle.cos();
                 self.car.yPos := self.car.yPos + self.speed*self.car.clock.tickTime*self.car.angle.sin();
             end
-        rotate(angle: Real) -- Clockwise if angle > 0, else, counterclockwise
+        rotate(angle:Real) -- Clockwise if angle > 0, else, counterclockwise
             begin 
                 self.car.angle := angle;
             end
@@ -161,7 +161,7 @@ class Clock
             begin
                 -- mover al coche, para que busque con su id el minimo | condicion para sin input no hacer nada 
                 declare snap : OutputCarSnapshot; 
-                while not(InputCarSnapshot.allInstances -> isEmpty()) do 
+                while not(InputCarSnapshot.allInstances->isEmpty()) do 
                     for o in self.ao do
                         o.action();
                         snap := new OutputCarSnapshot();
@@ -224,24 +224,3 @@ class OutputCarSnapshot < CarSnapshot
 class InputCarSnapshot < CarSnapshot
     end
 
-------- COMMANDS
-
-class Command
-    attributes 
-        twinId : String
-        timestamp : Integer
-        executionId : Integer
-        action : Action
-    operations
-        initialize()
-            begin
-                declare c: Car;
-                c:= Car.allInstances()->select(c:Car|c.twinId = self.twinId)->any(true);
-                self.timestamp := c.clock.now;
-                self.executionId := c.executionId;
-            end
-            pre: not(self.twinId.oclIsUndefined())
-    constraints    
-        inv noPhysicalTwinConnection:
-            not((Car.allInstances()->select(c:Car|c.twinId = self.twinId)->any(true)).oclIsUndefined())
-    end

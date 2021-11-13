@@ -6,8 +6,7 @@ import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import communication.CommandsReporter;
-import communication.SensorReceiver;
+import receiver.SensorReceiver;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -25,10 +24,6 @@ public class ConnectorMain {
 			SensorReceiver sr = new SensorReceiver(jedisPool, 8080);
 			snapshotsProducer.submit(sr);
 			
-			ExecutorService commandsReporter = Executors.newSingleThreadExecutor();			
-			CommandsReporter cr = new CommandsReporter(jedisPool, 8081, 500);
-			commandsReporter.submit(cr);
-			
 			Scanner scan = new Scanner(System.in);
 			System.out.println("Type \"end\" to close the connection and finish the program...");
 			while (true) {
@@ -37,7 +32,6 @@ public class ConnectorMain {
 				}
 			}
 			
-			cr.stop();
 			sr.stop();
 			scan.close();
 		} catch (UnknownHostException e) {

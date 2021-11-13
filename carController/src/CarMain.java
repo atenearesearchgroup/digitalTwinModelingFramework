@@ -7,7 +7,6 @@ import bluetooth.BluetoothConnector;
 import car.Car;
 import car.LineFollowerCar;
 import lejos.util.PilotProps;
-import reporter.CommandsReceiver;
 import reporter.SensorReporter;
 
 /**
@@ -26,16 +25,13 @@ public class CarMain {
 		pp.loadPersistentValues();
 
 		Car car = new LineFollowerCar();
-		ExecutorService snapshotsProducer = Executors.newSingleThreadExecutor();		
+		ExecutorService snapshotsProducer = Executors.newSingleThreadExecutor();
+		
 		SensorReporter sr = new SensorReporter(car, 8080, 5000);
 		snapshotsProducer.submit(sr);
 		
-		ExecutorService commandsExecutor = Executors.newSingleThreadExecutor();		
-		CommandsReceiver cr = new CommandsReceiver(8081, car);
-		commandsExecutor.submit(cr);		
-		
 		car.startBehaving();
-		
+
 		Scanner scan = new Scanner(System.in);
 		System.out.println("Type \"end\" to close the connection and finish the program...");
 		while (true) {
@@ -44,7 +40,6 @@ public class CarMain {
 			}
 		}
 		
-		cr.stop();
 		sr.stop();
 		scan.close();
 		conn.closeConnection();
