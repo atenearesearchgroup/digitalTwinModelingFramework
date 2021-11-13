@@ -64,7 +64,8 @@ public abstract class Car {
 		boolean reverse = Boolean.parseBoolean(pp.getProperty(PilotProps.KEY_REVERSE, this.REVERSE));
 
 		this.pilot = new DifferentialPilot(wheelDiameter, trackWidth, leftMotor, rightMotor, reverse);
-		this.pilot.setRotateSpeed(180);
+		this.pilot.setRotateSpeed(50);
+		this.pilot.setTravelSpeed(3);
 
 		this.poseProvider = new OdometryPoseProvider(this.pilot);
 	}

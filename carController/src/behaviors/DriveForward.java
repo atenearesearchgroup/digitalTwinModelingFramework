@@ -18,7 +18,8 @@ public class DriveForward extends CarBehavior{
 
 	public void action() {
 		super.action();
-		c.getPilot().forward();
+		c.getPilot().travel(0.001);
+		c.getPilot().stop();
 		while (c.getLight().readValue() <= 40)
 			Thread.yield(); // action complete when not on line
 	}

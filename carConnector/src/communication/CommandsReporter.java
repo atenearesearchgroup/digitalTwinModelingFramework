@@ -47,6 +47,10 @@ public class CommandsReporter implements Runnable {
 						BufferedWriter bf = new BufferedWriter(new OutputStreamWriter(this.client.getOutputStream()));
 						bf.write(action + "\n");
 						bf.flush();
+						String newEntry = "1" + c.substring(1);
+						jedis.rename(c, newEntry);
+						jedis.zrem("commands", c);
+						jedis.zadd(c, 0, newEntry);
 						System.out.println("[INFO-PT-CommandsReporter] " + action);
 					} catch (IOException e) {
 						e.printStackTrace();
