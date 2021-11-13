@@ -11,7 +11,7 @@ import redis.clients.jedis.JedisPool;
  * @author Paula Mu&ntilde;oz - University of M&atilde;laga
  * 
  */
-public class InPubService implements Runnable {
+public class InPubService extends PubService {
 	
 	private JedisPool jedisPool;
 	private int sleepTime;
@@ -24,7 +24,8 @@ public class InPubService implements Runnable {
 	 * @param jedisPool		Jedis client pool, connected to the Data Lake
 	 * @param sleepTime		Milliseconds between each check in the database.
 	 */
-	public InPubService(UseSystemApi api, JedisPool jedisPool, int sleepTime) {
+	public InPubService(String channel, UseSystemApi api, JedisPool jedisPool, int sleepTime) {
+		super(channel);
 		this.jedisPool = jedisPool;
 		this.sleepTime = sleepTime;
 		this.running = true;
@@ -47,7 +48,7 @@ public class InPubService implements Runnable {
             Jedis jedisTempConnDL = jedisPool.getResource();
             try {
             	if(!InputSnapshotsManager.getUnprocessedSnapshots(jedisTempConnDL).isEmpty()) {
-            		jedisTempConn.publish(DTPubSub.DT_IN_CHANNEL, "New Snapshots in database");
+            		jedisTempConn.publish(this.getChannel(), "New Snapshots in database");
             		System.out.println("[" + this.hashCode() + "-DT] " + "New Snapshots in database");
             	}
             } catch (Exception e) {

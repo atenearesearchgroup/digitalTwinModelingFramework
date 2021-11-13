@@ -1,8 +1,10 @@
 package car;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-import lejos.nxt.Button;
 import lejos.nxt.LCD;
 import lejos.nxt.LightSensor;
 import lejos.nxt.SensorPort;
@@ -36,10 +38,15 @@ public abstract class Car {
 	private RotateMoveController pilot;
 	private OdometryPoseProvider poseProvider;
 	private Behavior[] behaviors;
-	
+
 	private String activeBehavior;
 
+	protected List<String> commands;
+
 	public Car() throws IOException {
+		/* COMMANDS */
+		this.commands = new LinkedList<>();
+
 		/* SENSORS */
 		this.light = new LightSensor(SensorPort.S3);
 		this.ultrasonic = new UltrasonicSensor(SensorPort.S2);
@@ -57,16 +64,31 @@ public abstract class Car {
 		boolean reverse = Boolean.parseBoolean(pp.getProperty(PilotProps.KEY_REVERSE, this.REVERSE));
 
 		this.pilot = new DifferentialPilot(wheelDiameter, trackWidth, leftMotor, rightMotor, reverse);
-		this.pilot.setRotateSpeed(180);
-		
+		this.pilot.setRotateSpeed(50);
+		this.pilot.setTravelSpeed(3);
+
 		this.poseProvider = new OdometryPoseProvider(this.pilot);
 	}
 
-	
 	public void startBehaving() {
 		LCD.drawString("Line ", 0, 1);
-		Button.waitForAnyPress();
 		(new Arbitrator(getBehaviors())).start();
+	}
+
+	public void addToQueue(String command) {
+		commands.add(command);
+	}
+
+	public void execute() {
+		commands.remove(0);
+	}
+	
+	public boolean commandsIsEmpty() {
+		return this.commands.isEmpty();
+	}
+	
+	public List<String> commands(){
+		return Collections.unmodifiableList(this.commands);
 	}
 
 	public LightSensor getLight() {
@@ -96,11 +118,11 @@ public abstract class Car {
 	public void setBehaviors(Behavior[] behaviors) {
 		this.behaviors = behaviors;
 	}
-	
+
 	public OdometryPoseProvider getPoseProvider() {
 		return poseProvider;
 	}
-	
+
 	public void setActiveBehavior(String activeBehavior) {
 		this.activeBehavior = activeBehavior;
 	}
