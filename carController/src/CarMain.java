@@ -28,13 +28,13 @@ public class CarMain {
 
 		//Car car = new LineFollowerCar();
 		Car car = new RemoteControlledCar();
-		ExecutorService snapshotsProducer = Executors.newSingleThreadExecutor();		
-		SensorReporter sr = new SensorReporter(car, 8080, 50000);
-		snapshotsProducer.submit(sr);
 		
-		ExecutorService commandsExecutor = Executors.newSingleThreadExecutor();		
-		CommandsReceiver cr = new CommandsReceiver(8081, car);
-		commandsExecutor.submit(cr);		
+		ExecutorService threadManager = Executors.newFixedThreadPool(2);		
+		SensorReporter sr = new SensorReporter(car, 8080, 5000);
+		threadManager.submit(sr);
+			
+		CommandsReceiver cr = new CommandsReceiver(8081, car, 5000);
+		threadManager.submit(cr);		
 		
 		car.startBehaving();
 		

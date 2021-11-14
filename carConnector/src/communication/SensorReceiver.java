@@ -33,7 +33,8 @@ public class SensorReceiver implements Runnable {
 	private ServerSocket server;
 	private int port;
 	private boolean running;
-
+	private int sleepTime;
+	
 	/**
 	 * Default constructor
 	 * 
@@ -42,11 +43,12 @@ public class SensorReceiver implements Runnable {
 	 * @throws UnknownHostException
 	 * @throws IOException
 	 */
-	public SensorReceiver(JedisPool jedisPool, int port) throws UnknownHostException, IOException {
+	public SensorReceiver(JedisPool jedisPool, int port, int sleepTime) throws UnknownHostException, IOException {
 		this.jedisPool = jedisPool;
 		this.running = true;
 		this.port = port;
 		this.server = new ServerSocket(this.port);
+		this.sleepTime = sleepTime;
 		
 		this.attributes = new HashMap<>();
 		
@@ -72,7 +74,6 @@ public class SensorReceiver implements Runnable {
 	 * This method runs in the background, receiving information from the Physical Twin and storing it into the Data Lake.
 	 */
 	public void run() {
-		Jedis jedis = jedisPool.getResource();
 		while (running) {
 			try {
 				Socket connection = server.accept();
@@ -81,38 +82,43 @@ public class SensorReceiver implements Runnable {
 
 				BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 				while (running) {
-					String message = inFromClient.readLine();
-					System.out.println("[INFO-PT]" + message);
-					Map<String, String> sensorValues = new HashMap<>();
-					
-					JSONParser parser = new JSONParser();
-					JSONObject snapshot = (JSONObject) parser.parse(message);
-					String snapshotId = snapshot.get(SNAPSHOT_ID).toString();
-					
-					for(String attribute : attributes.keySet()) {
-						String value = snapshot.get(attribute).toString().replace(',', '.');;
-						System.out.println("[INFO-PT-Reception] " + attribute + ": " + value);
-						sensorValues.put(attribute, value);
-						if(attributes.get(attribute).equals(NUMBER)) {							
-							addSearchRegister(attribute, Double.parseDouble(value), snapshotId, jedis);
+					if(inFromClient.ready()) {
+						Jedis jedis = jedisPool.getResource();
+						String message = inFromClient.readLine();
+						System.out.println("[INFO-PT]" + message);
+						Map<String, String> sensorValues = new HashMap<>();
+						
+						JSONParser parser = new JSONParser();
+						JSONObject snapshot = (JSONObject) parser.parse(message);
+						String snapshotId = snapshot.get(SNAPSHOT_ID).toString();
+						
+						for(String attribute : attributes.keySet()) {
+							String value = snapshot.get(attribute).toString().replace(',', '.');;
+							System.out.println("[INFO-PT-Reception] " + attribute + ": " + value);
+							sensorValues.put(attribute, value);
+							if(attributes.get(attribute).equals(NUMBER)) {							
+								addSearchRegister(attribute, Double.parseDouble(value), snapshotId, jedis);
+							}
 						}
-					}
-					
-					int processingQueue = 0;
-					sensorValues.put(PROCESSING_QUEUE, Integer.toString(processingQueue));
-					jedis.zadd(PROCESSING_QUEUE + "List", processingQueue, 0 + ":" + snapshotId);
-					
-					int physicalTwin = 1;
-					sensorValues.put(PHYSICAL_TWIN, Integer.toString(physicalTwin));
-					addSearchRegister(PHYSICAL_TWIN, physicalTwin, snapshotId, jedis);
+						
+						int processingQueue = 0;
+						sensorValues.put(PROCESSING_QUEUE, Integer.toString(processingQueue));
+						jedis.zadd(PROCESSING_QUEUE + "List", processingQueue, 0 + ":" + snapshotId);
+						
+						int physicalTwin = 1;
+						sensorValues.put(PHYSICAL_TWIN, Integer.toString(physicalTwin));
+						addSearchRegister(PHYSICAL_TWIN, physicalTwin, snapshotId, jedis);
 
-					jedis.hset(snapshotId, sensorValues);
+						jedis.hset(snapshotId, sensorValues);
+						jedisPool.returnResource(jedis);
+					} else {
+						System.out.println("[INFO-PT] No new snapshots");
+					}
+					Thread.sleep(sleepTime);
 				}
 				connection.close();
 			} catch (Exception e) {
 				e.printStackTrace();
-			} finally {
-				jedisPool.returnResource(jedis);
 			}
 		}
 	}

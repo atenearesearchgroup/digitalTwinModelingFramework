@@ -18,19 +18,19 @@
         </strategy>
         <hidden>false</hidden>
     </node>
-    <node id="LineFollowingBehavior1" sizeCalculated="true" type="Object">
-        <name>LineFollowingBehavior1</name>
-        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
-            <x>170.626722198189</x>
-            <y>227.63794227066717</y>
-        </strategy>
-        <hidden>false</hidden>
-    </node>
     <node id="UltrasonicSensor1" sizeCalculated="true" type="Object">
         <name>UltrasonicSensor1</name>
         <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
             <x>9.023149445652507</x>
             <y>169.1949866114162</y>
+        </strategy>
+        <hidden>false</hidden>
+    </node>
+    <node id="RemoteControlBehavior1" sizeCalculated="true" type="Object">
+        <name>RemoteControlBehavior1</name>
+        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
+            <x>87.35259293452759</x>
+            <y>237.3662054780081</y>
         </strategy>
         <hidden>false</hidden>
     </node>
@@ -58,27 +58,11 @@
         </strategy>
         <hidden>false</hidden>
     </node>
-    <node id="OutputCarSnapshot1" sizeCalculated="true" type="Object">
-        <name>OutputCarSnapshot1</name>
-        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
-            <x>513.9789472290936</x>
-            <y>28.722324061469095</y>
-        </strategy>
-        <hidden>false</hidden>
-    </node>
     <node id="LightSensor1" sizeCalculated="true" type="Object">
         <name>LightSensor1</name>
         <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
             <x>17.373054673025536</x>
             <y>115.84482191666274</y>
-        </strategy>
-        <hidden>false</hidden>
-    </node>
-    <node id="c1" sizeCalculated="true" type="Object">
-        <name>c1</name>
-        <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyFixed">
-            <x>524.979191462907</x>
-            <y>269.77635491024307</y>
         </strategy>
         <hidden>false</hidden>
     </node>
@@ -111,17 +95,15 @@
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
-            <edgeproperty id="[LightSensorConnection : (car:car, light:LightSensor1)]::AssociationName" sizeCalculated="true" type="associationName" userDefined="false" visible="true">
-                <name>LightSensorConnection</name>
-                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyInBetween">
+            <edgeproperty id="[LightSensorConnection : (car:car, light:LightSensor1)]::source::multiplicity" sizeCalculated="true" type="multiplicity" userDefined="false" visible="true">
+                <name>1</name>
+                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyRelativeToAttached">
                     <userOffsetX>0.0</userOffsetX>
                     <userOffsetY>0.0</userOffsetY>
-                    <offsetX>0.0</offsetX>
-                    <offsetY>-10.0</offsetY>
-                    <related length="2">
-                        <related0>[LightSensorConnection : (car:car, light:LightSensor1)]::WayPoint::0</related0>
-                        <related1>[LightSensorConnection : (car:car, light:LightSensor1)]::WayPoint::1</related1>
-                    </related>
+                    <attached>[LightSensorConnection : (car:car, light:LightSensor1)]::WayPoint::0</attached>
+                    <offset_x>8</offset_x>
+                    <offset_y>8</offset_y>
+                    <placement>BOTTOM</placement>
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
@@ -137,15 +119,17 @@
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
-            <edgeproperty id="[LightSensorConnection : (car:car, light:LightSensor1)]::source::multiplicity" sizeCalculated="true" type="multiplicity" userDefined="false" visible="true">
-                <name>1</name>
-                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyRelativeToAttached">
+            <edgeproperty id="[LightSensorConnection : (car:car, light:LightSensor1)]::AssociationName" sizeCalculated="true" type="associationName" userDefined="false" visible="true">
+                <name>LightSensorConnection</name>
+                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyInBetween">
                     <userOffsetX>0.0</userOffsetX>
                     <userOffsetY>0.0</userOffsetY>
-                    <attached>[LightSensorConnection : (car:car, light:LightSensor1)]::WayPoint::0</attached>
-                    <offset_x>8</offset_x>
-                    <offset_y>8</offset_y>
-                    <placement>BOTTOM</placement>
+                    <offsetX>0.0</offsetX>
+                    <offsetY>-10.0</offsetY>
+                    <related length="2">
+                        <related0>[LightSensorConnection : (car:car, light:LightSensor1)]::WayPoint::0</related0>
+                        <related1>[LightSensorConnection : (car:car, light:LightSensor1)]::WayPoint::1</related1>
+                    </related>
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
@@ -204,17 +188,15 @@
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
-            <edgeproperty id="[TouchSensorConnection : (car:car, touch:TouchSensor1)]::AssociationName" sizeCalculated="true" type="associationName" userDefined="false" visible="true">
-                <name>TouchSensorConnection</name>
-                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyInBetween">
+            <edgeproperty id="[TouchSensorConnection : (car:car, touch:TouchSensor1)]::source::rolename" sizeCalculated="true" type="rolename" userDefined="false" visible="true">
+                <name>car</name>
+                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyRelativeToAttached">
                     <userOffsetX>0.0</userOffsetX>
                     <userOffsetY>0.0</userOffsetY>
-                    <offsetX>0.0</offsetX>
-                    <offsetY>-10.0</offsetY>
-                    <related length="2">
-                        <related0>[TouchSensorConnection : (car:car, touch:TouchSensor1)]::WayPoint::0</related0>
-                        <related1>[TouchSensorConnection : (car:car, touch:TouchSensor1)]::WayPoint::1</related1>
-                    </related>
+                    <attached>[TouchSensorConnection : (car:car, touch:TouchSensor1)]::WayPoint::0</attached>
+                    <offset_x>8</offset_x>
+                    <offset_y>8</offset_y>
+                    <placement>TOP</placement>
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
@@ -230,15 +212,17 @@
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
-            <edgeproperty id="[TouchSensorConnection : (car:car, touch:TouchSensor1)]::source::rolename" sizeCalculated="true" type="rolename" userDefined="false" visible="true">
-                <name>car</name>
-                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyRelativeToAttached">
+            <edgeproperty id="[TouchSensorConnection : (car:car, touch:TouchSensor1)]::AssociationName" sizeCalculated="true" type="associationName" userDefined="false" visible="true">
+                <name>TouchSensorConnection</name>
+                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyInBetween">
                     <userOffsetX>0.0</userOffsetX>
                     <userOffsetY>0.0</userOffsetY>
-                    <attached>[TouchSensorConnection : (car:car, touch:TouchSensor1)]::WayPoint::0</attached>
-                    <offset_x>8</offset_x>
-                    <offset_y>8</offset_y>
-                    <placement>TOP</placement>
+                    <offsetX>0.0</offsetX>
+                    <offsetY>-10.0</offsetY>
+                    <related length="2">
+                        <related0>[TouchSensorConnection : (car:car, touch:TouchSensor1)]::WayPoint::0</related0>
+                        <related1>[TouchSensorConnection : (car:car, touch:TouchSensor1)]::WayPoint::1</related1>
+                    </related>
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
@@ -305,17 +289,15 @@
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
-            <edgeproperty id="[Timing : (ao:car, clock:clock)]::AssociationName" sizeCalculated="true" type="associationName" userDefined="false" visible="true">
-                <name>Timing</name>
-                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyInBetween">
+            <edgeproperty id="[Timing : (ao:car, clock:clock)]::source::multiplicity" sizeCalculated="true" type="multiplicity" userDefined="false" visible="true">
+                <name>1</name>
+                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyRelativeToAttached">
                     <userOffsetX>0.0</userOffsetX>
                     <userOffsetY>0.0</userOffsetY>
-                    <offsetX>0.0</offsetX>
-                    <offsetY>-10.0</offsetY>
-                    <related length="2">
-                        <related0>[Timing : (ao:car, clock:clock)]::WayPoint::0</related0>
-                        <related1>[Timing : (ao:car, clock:clock)]::WayPoint::1</related1>
-                    </related>
+                    <attached>[Timing : (ao:car, clock:clock)]::WayPoint::0</attached>
+                    <offset_x>8</offset_x>
+                    <offset_y>8</offset_y>
+                    <placement>BOTTOM</placement>
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
@@ -331,15 +313,17 @@
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
-            <edgeproperty id="[Timing : (ao:car, clock:clock)]::source::multiplicity" sizeCalculated="true" type="multiplicity" userDefined="false" visible="true">
-                <name>1</name>
-                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyRelativeToAttached">
+            <edgeproperty id="[Timing : (ao:car, clock:clock)]::AssociationName" sizeCalculated="true" type="associationName" userDefined="false" visible="true">
+                <name>Timing</name>
+                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyInBetween">
                     <userOffsetX>0.0</userOffsetX>
                     <userOffsetY>0.0</userOffsetY>
-                    <attached>[Timing : (ao:car, clock:clock)]::WayPoint::0</attached>
-                    <offset_x>8</offset_x>
-                    <offset_y>8</offset_y>
-                    <placement>BOTTOM</placement>
+                    <offsetX>0.0</offsetX>
+                    <offsetY>-10.0</offsetY>
+                    <related length="2">
+                        <related0>[Timing : (ao:car, clock:clock)]::WayPoint::0</related0>
+                        <related1>[Timing : (ao:car, clock:clock)]::WayPoint::1</related1>
+                    </related>
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
@@ -371,34 +355,58 @@
     </edge>
     <edge type="BinaryEdge">
         <source>car</source>
-        <target>LineFollowingBehavior1</target>
+        <target>RemoteControlBehavior1</target>
         <name>CarBehaviors</name>
         <properties>
-            <edgeproperty id="[CarBehaviors : (behavior:LineFollowingBehavior1, car:car)]::target::rolename" sizeCalculated="true" type="rolename" userDefined="false" visible="true">
-                <name>behavior {ordered}</name>
-                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyRelativeToAttached">
-                    <userOffsetX>0.0</userOffsetX>
-                    <userOffsetY>0.0</userOffsetY>
-                    <attached>[CarBehaviors : (behavior:LineFollowingBehavior1, car:car)]::WayPoint::1</attached>
-                    <offset_x>8</offset_x>
-                    <offset_y>8</offset_y>
-                    <placement>TOP</placement>
-                </strategy>
-                <hidden>false</hidden>
-            </edgeproperty>
-            <edgeproperty id="[CarBehaviors : (behavior:LineFollowingBehavior1, car:car)]::target::multiplicity" sizeCalculated="true" type="multiplicity" userDefined="false" visible="true">
+            <edgeproperty id="[CarBehaviors : (behavior:RemoteControlBehavior1, car:car)]::target::multiplicity" sizeCalculated="true" type="multiplicity" userDefined="false" visible="true">
                 <name>1..*</name>
                 <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyRelativeToAttached">
                     <userOffsetX>0.0</userOffsetX>
                     <userOffsetY>0.0</userOffsetY>
-                    <attached>[CarBehaviors : (behavior:LineFollowingBehavior1, car:car)]::WayPoint::1</attached>
+                    <attached>[CarBehaviors : (behavior:RemoteControlBehavior1, car:car)]::WayPoint::1</attached>
                     <offset_x>8</offset_x>
                     <offset_y>8</offset_y>
                     <placement>BOTTOM</placement>
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
-            <edgeproperty id="[CarBehaviors : (behavior:LineFollowingBehavior1, car:car)]::AssociationName" sizeCalculated="true" type="associationName" userDefined="false" visible="true">
+            <edgeproperty id="[CarBehaviors : (behavior:RemoteControlBehavior1, car:car)]::target::rolename" sizeCalculated="true" type="rolename" userDefined="false" visible="true">
+                <name>behavior {ordered}</name>
+                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyRelativeToAttached">
+                    <userOffsetX>0.0</userOffsetX>
+                    <userOffsetY>0.0</userOffsetY>
+                    <attached>[CarBehaviors : (behavior:RemoteControlBehavior1, car:car)]::WayPoint::1</attached>
+                    <offset_x>8</offset_x>
+                    <offset_y>8</offset_y>
+                    <placement>TOP</placement>
+                </strategy>
+                <hidden>false</hidden>
+            </edgeproperty>
+            <edgeproperty id="[CarBehaviors : (behavior:RemoteControlBehavior1, car:car)]::source::rolename" sizeCalculated="true" type="rolename" userDefined="false" visible="true">
+                <name>car</name>
+                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyRelativeToAttached">
+                    <userOffsetX>0.0</userOffsetX>
+                    <userOffsetY>0.0</userOffsetY>
+                    <attached>[CarBehaviors : (behavior:RemoteControlBehavior1, car:car)]::WayPoint::0</attached>
+                    <offset_x>8</offset_x>
+                    <offset_y>8</offset_y>
+                    <placement>TOP</placement>
+                </strategy>
+                <hidden>false</hidden>
+            </edgeproperty>
+            <edgeproperty id="[CarBehaviors : (behavior:RemoteControlBehavior1, car:car)]::source::multiplicity" sizeCalculated="true" type="multiplicity" userDefined="false" visible="true">
+                <name>1</name>
+                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyRelativeToAttached">
+                    <userOffsetX>0.0</userOffsetX>
+                    <userOffsetY>0.0</userOffsetY>
+                    <attached>[CarBehaviors : (behavior:RemoteControlBehavior1, car:car)]::WayPoint::0</attached>
+                    <offset_x>8</offset_x>
+                    <offset_y>8</offset_y>
+                    <placement>BOTTOM</placement>
+                </strategy>
+                <hidden>false</hidden>
+            </edgeproperty>
+            <edgeproperty id="[CarBehaviors : (behavior:RemoteControlBehavior1, car:car)]::AssociationName" sizeCalculated="true" type="associationName" userDefined="false" visible="true">
                 <name>CarBehaviors</name>
                 <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyInBetween">
                     <userOffsetX>0.0</userOffsetX>
@@ -406,39 +414,15 @@
                     <offsetX>0.0</offsetX>
                     <offsetY>-10.0</offsetY>
                     <related length="2">
-                        <related0>[CarBehaviors : (behavior:LineFollowingBehavior1, car:car)]::WayPoint::0</related0>
-                        <related1>[CarBehaviors : (behavior:LineFollowingBehavior1, car:car)]::WayPoint::1</related1>
+                        <related0>[CarBehaviors : (behavior:RemoteControlBehavior1, car:car)]::WayPoint::0</related0>
+                        <related1>[CarBehaviors : (behavior:RemoteControlBehavior1, car:car)]::WayPoint::1</related1>
                     </related>
-                </strategy>
-                <hidden>false</hidden>
-            </edgeproperty>
-            <edgeproperty id="[CarBehaviors : (behavior:LineFollowingBehavior1, car:car)]::source::rolename" sizeCalculated="true" type="rolename" userDefined="false" visible="true">
-                <name>car</name>
-                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyRelativeToAttached">
-                    <userOffsetX>0.0</userOffsetX>
-                    <userOffsetY>0.0</userOffsetY>
-                    <attached>[CarBehaviors : (behavior:LineFollowingBehavior1, car:car)]::WayPoint::0</attached>
-                    <offset_x>8</offset_x>
-                    <offset_y>8</offset_y>
-                    <placement>TOP</placement>
-                </strategy>
-                <hidden>false</hidden>
-            </edgeproperty>
-            <edgeproperty id="[CarBehaviors : (behavior:LineFollowingBehavior1, car:car)]::source::multiplicity" sizeCalculated="true" type="multiplicity" userDefined="false" visible="true">
-                <name>1</name>
-                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyRelativeToAttached">
-                    <userOffsetX>0.0</userOffsetX>
-                    <userOffsetY>0.0</userOffsetY>
-                    <attached>[CarBehaviors : (behavior:LineFollowingBehavior1, car:car)]::WayPoint::0</attached>
-                    <offset_x>8</offset_x>
-                    <offset_y>8</offset_y>
-                    <placement>BOTTOM</placement>
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
         </properties>
         <waypoints>
-            <edgeproperty id="[CarBehaviors : (behavior:LineFollowingBehavior1, car:car)]::WayPoint::0" sizeCalculated="true" type="WayPoint" userDefined="false" visible="true">
+            <edgeproperty id="[CarBehaviors : (behavior:RemoteControlBehavior1, car:car)]::WayPoint::0" sizeCalculated="true" type="WayPoint" userDefined="false" visible="true">
                 <name>0</name>
                 <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyAttachedIntersection">
                     <userOffsetX>0.0</userOffsetX>
@@ -448,7 +432,7 @@
                 <specialid>1</specialid>
                 <hidden>false</hidden>
             </edgeproperty>
-            <edgeproperty id="[CarBehaviors : (behavior:LineFollowingBehavior1, car:car)]::WayPoint::1" sizeCalculated="true" type="WayPoint" userDefined="false" visible="true">
+            <edgeproperty id="[CarBehaviors : (behavior:RemoteControlBehavior1, car:car)]::WayPoint::1" sizeCalculated="true" type="WayPoint" userDefined="false" visible="true">
                 <name>1</name>
                 <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyAttachedIntersection">
                     <userOffsetX>0.0</userOffsetX>
@@ -460,7 +444,7 @@
             </edgeproperty>
         </waypoints>
         <hidden>false</hidden>
-        <linkValue>[CarBehaviors : (behavior:LineFollowingBehavior1, car:car)]</linkValue>
+        <linkValue>[CarBehaviors : (behavior:RemoteControlBehavior1, car:car)]</linkValue>
     </edge>
     <edge type="BinaryEdge">
         <source>car</source>
@@ -491,17 +475,15 @@
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
-            <edgeproperty id="[MotorConnection : (car:car, motor:Motor1)]::AssociationName" sizeCalculated="true" type="associationName" userDefined="false" visible="true">
-                <name>MotorConnection</name>
-                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyInBetween">
+            <edgeproperty id="[MotorConnection : (car:car, motor:Motor1)]::source::rolename" sizeCalculated="true" type="rolename" userDefined="false" visible="true">
+                <name>car</name>
+                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyRelativeToAttached">
                     <userOffsetX>0.0</userOffsetX>
                     <userOffsetY>0.0</userOffsetY>
-                    <offsetX>0.0</offsetX>
-                    <offsetY>-10.0</offsetY>
-                    <related length="2">
-                        <related0>[MotorConnection : (car:car, motor:Motor1)]::WayPoint::0</related0>
-                        <related1>[MotorConnection : (car:car, motor:Motor1)]::WayPoint::1</related1>
-                    </related>
+                    <attached>[MotorConnection : (car:car, motor:Motor1)]::WayPoint::0</attached>
+                    <offset_x>8</offset_x>
+                    <offset_y>8</offset_y>
+                    <placement>TOP</placement>
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
@@ -517,15 +499,17 @@
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
-            <edgeproperty id="[MotorConnection : (car:car, motor:Motor1)]::source::rolename" sizeCalculated="true" type="rolename" userDefined="false" visible="true">
-                <name>car</name>
-                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyRelativeToAttached">
+            <edgeproperty id="[MotorConnection : (car:car, motor:Motor1)]::AssociationName" sizeCalculated="true" type="associationName" userDefined="false" visible="true">
+                <name>MotorConnection</name>
+                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyInBetween">
                     <userOffsetX>0.0</userOffsetX>
                     <userOffsetY>0.0</userOffsetY>
-                    <attached>[MotorConnection : (car:car, motor:Motor1)]::WayPoint::0</attached>
-                    <offset_x>8</offset_x>
-                    <offset_y>8</offset_y>
-                    <placement>TOP</placement>
+                    <offsetX>0.0</offsetX>
+                    <offsetY>-10.0</offsetY>
+                    <related length="2">
+                        <related0>[MotorConnection : (car:car, motor:Motor1)]::WayPoint::0</related0>
+                        <related1>[MotorConnection : (car:car, motor:Motor1)]::WayPoint::1</related1>
+                    </related>
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
@@ -584,20 +568,6 @@
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>
-            <edgeproperty id="[UltrasonicSensorConnection : (car:car, sound:UltrasonicSensor1)]::AssociationName" sizeCalculated="true" type="associationName" userDefined="false" visible="true">
-                <name>UltrasonicSensorConnection</name>
-                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyInBetween">
-                    <userOffsetX>0.0</userOffsetX>
-                    <userOffsetY>0.0</userOffsetY>
-                    <offsetX>0.0</offsetX>
-                    <offsetY>-10.0</offsetY>
-                    <related length="2">
-                        <related0>[UltrasonicSensorConnection : (car:car, sound:UltrasonicSensor1)]::WayPoint::0</related0>
-                        <related1>[UltrasonicSensorConnection : (car:car, sound:UltrasonicSensor1)]::WayPoint::1</related1>
-                    </related>
-                </strategy>
-                <hidden>false</hidden>
-            </edgeproperty>
             <edgeproperty id="[UltrasonicSensorConnection : (car:car, sound:UltrasonicSensor1)]::source::rolename" sizeCalculated="true" type="rolename" userDefined="false" visible="true">
                 <name>car</name>
                 <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyRelativeToAttached">
@@ -619,6 +589,20 @@
                     <offset_x>8</offset_x>
                     <offset_y>8</offset_y>
                     <placement>BOTTOM</placement>
+                </strategy>
+                <hidden>false</hidden>
+            </edgeproperty>
+            <edgeproperty id="[UltrasonicSensorConnection : (car:car, sound:UltrasonicSensor1)]::AssociationName" sizeCalculated="true" type="associationName" userDefined="false" visible="true">
+                <name>UltrasonicSensorConnection</name>
+                <strategy type="org.tzi.use.gui.views.diagrams.elements.positioning.StrategyInBetween">
+                    <userOffsetX>0.0</userOffsetX>
+                    <userOffsetY>0.0</userOffsetY>
+                    <offsetX>0.0</offsetX>
+                    <offsetY>-10.0</offsetY>
+                    <related length="2">
+                        <related0>[UltrasonicSensorConnection : (car:car, sound:UltrasonicSensor1)]::WayPoint::0</related0>
+                        <related1>[UltrasonicSensorConnection : (car:car, sound:UltrasonicSensor1)]::WayPoint::1</related1>
+                    </related>
                 </strategy>
                 <hidden>false</hidden>
             </edgeproperty>

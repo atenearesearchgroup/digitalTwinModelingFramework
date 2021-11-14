@@ -57,7 +57,10 @@ public class CommandsReporter implements Runnable {
 					}
 
 				}
+			} else {
+				System.out.println("[INFO-PT-CommandsReporter] No new commands.");
 			}
+			jedisPool.returnResource(jedis);
 			try {
 				Thread.sleep(this.sleepTime);
 			} catch (InterruptedException e) {

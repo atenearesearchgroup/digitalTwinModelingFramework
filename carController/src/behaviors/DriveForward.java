@@ -19,7 +19,6 @@ public class DriveForward extends CarBehavior{
 
 	public void action() {
 		super.action();
-		c.getPilot().travel(0.001);
-		Thread.yield(); // action complete when not on line
+		c.getPilot().travel(1);
 	}
 }

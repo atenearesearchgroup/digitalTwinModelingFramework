@@ -21,13 +21,13 @@ public class ConnectorMain {
 	public static void  main(String[] args) {
 		JedisPool jedisPool = new JedisPool(new JedisPoolConfig(), "localhost"); 
 		try {
-			ExecutorService snapshotsProducer = Executors.newSingleThreadExecutor();			
-			SensorReceiver sr = new SensorReceiver(jedisPool, 8080);
-			snapshotsProducer.submit(sr);
+			ExecutorService executor = Executors.newFixedThreadPool(2);	
 			
-			ExecutorService commandsReporter = Executors.newSingleThreadExecutor();			
-			CommandsReporter cr = new CommandsReporter(jedisPool, 8081, 500);
-			commandsReporter.submit(cr);
+			SensorReceiver sr = new SensorReceiver(jedisPool, 8080, 5000);
+			executor.submit(sr);
+					
+			CommandsReporter cr = new CommandsReporter(jedisPool, 8081, 5000);
+			executor.submit(cr);
 			
 			Scanner scan = new Scanner(System.in);
 			System.out.println("Type \"end\" to close the connection and finish the program...");
