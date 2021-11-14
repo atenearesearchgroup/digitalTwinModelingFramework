@@ -52,7 +52,7 @@ public class OutPubService extends PubService {
             try {
             	if(!output.getObjects(api).isEmpty()) {
             		jedisTemporalConnection.publish(this.getChannel(), "New Information");
-            		System.out.println("[" + this.hashCode() + "-" + this.getChannel()+ "]" + "New Information");
+            		System.out.println("[" + this.hashCode() + "-" + this.getChannel()+ "]" + " New Information");
             	}
             } catch (Exception e) {
                e.printStackTrace();

@@ -2,10 +2,10 @@ package behaviors;
 
 import car.Car;
 
-public class DriveForward extends CarBehavior{	
+public class TurnRight extends CarBehavior{	
 	
-	public DriveForward(Car c) {
-		super("Forward", c);
+	public TurnRight(Car c) {
+		super("TurnRight", c);
 	}
 
 	// It never takes control on its own, since it is a behavior for the remote control
@@ -19,7 +19,7 @@ public class DriveForward extends CarBehavior{
 
 	public void action() {
 		super.action();
-		c.getPilot().travel(0.001);
+		c.getPilot().rotate(90);
 		Thread.yield(); // action complete when not on line
 	}
 }

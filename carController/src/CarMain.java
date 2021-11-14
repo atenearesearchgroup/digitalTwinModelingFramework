@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import bluetooth.BluetoothConnector;
 import car.Car;
 import car.LineFollowerCar;
+import car.RemoteControlledCar;
 import lejos.util.PilotProps;
 import reporter.CommandsReceiver;
 import reporter.SensorReporter;
@@ -25,9 +26,10 @@ public class CarMain {
 		PilotProps pp = new PilotProps();
 		pp.loadPersistentValues();
 
-		Car car = new LineFollowerCar();
+		//Car car = new LineFollowerCar();
+		Car car = new RemoteControlledCar();
 		ExecutorService snapshotsProducer = Executors.newSingleThreadExecutor();		
-		SensorReporter sr = new SensorReporter(car, 8080, 5000);
+		SensorReporter sr = new SensorReporter(car, 8080, 50000);
 		snapshotsProducer.submit(sr);
 		
 		ExecutorService commandsExecutor = Executors.newSingleThreadExecutor();		

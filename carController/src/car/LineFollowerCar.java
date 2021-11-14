@@ -1,7 +1,7 @@
 package car;
 
 import java.io.IOException;
-import behaviors.DriveForward;
+import behaviors.DriveOnLine;
 import behaviors.OffLine;
 import behaviors.RemoteControl;
 import lejos.robotics.subsumption.Behavior;
@@ -14,7 +14,7 @@ import lejos.robotics.subsumption.Behavior;
 public class LineFollowerCar extends Car {
 	
 	private OffLine offLineBehav;
-	private DriveForward driveForwardBehav;
+	private DriveOnLine driveForwardBehav;
 	private RemoteControl remoteControlBehav;
 	
 
@@ -26,7 +26,7 @@ public class LineFollowerCar extends Car {
 		super();
 	
 		offLineBehav = new OffLine(this);
-		driveForwardBehav = new DriveForward(this);
+		driveForwardBehav = new DriveOnLine(this);
 		remoteControlBehav = new RemoteControl(this);
 		this.setBehaviors(new Behavior[]{this.offLineBehav, this.driveForwardBehav, this.remoteControlBehav});
 	}

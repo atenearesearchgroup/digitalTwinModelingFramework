@@ -1,25 +1,20 @@
-!new Clock('clock');
-!new Car('car');
-!car.init();
-!car.executionId := 1627763802
-!car.twinId := 'NXJCar'
-!insert(clock, car) into Timing;
-!new InputCarSnapshot('inNXJCar1627763802')
-!inNXJCar1627763802.executionId := 1627763802
-!inNXJCar1627763802.twinId := 'NXJCar'
-!inNXJCar1627763802.yPos := 0.0
-!inNXJCar1627763802.distance := 54
-!inNXJCar1627763802.light := 43
-!inNXJCar1627763802.isMoving := true
-!inNXJCar1627763802.bump := false
-!inNXJCar1627763802.angle := -18.61
-!inNXJCar1627763802.action := Action::Rotate
-!inNXJCar1627763802.xPos := 0.0
-!inNXJCar1627763802.processingQueue := true
-!inNXJCar1627763802.speed := 30.53
-!inNXJCar1627763802.timestamp := 1627763802
-!clock.tick();
 !new Command('c1');
 !c1.twinId := 'NXJCar';
-!c1.action := Action::Rotate;
+!c1.action := Action::Forward;
 !c1.initialize();
+
+!new Command('c2');
+!c2.twinId := 'NXJCar';
+!c2.action := Action::TurnLeft;
+!c2.initialize();
+
+!new Command('c3');
+!c3.twinId := 'NXJCar';
+!c3.action := Action::TurnRight;
+!c3.initialize();
+
+!new Command('c4');
+!c4.twinId := 'NXJCar';
+!c4.action := Action::Backward;
+!c4.initialize();
+
