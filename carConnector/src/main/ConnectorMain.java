@@ -26,7 +26,7 @@ public class ConnectorMain {
 			SensorReceiver sr = new SensorReceiver(jedisPool, 8080, 5000);
 			executor.submit(sr);
 					
-			CommandsReporter cr = new CommandsReporter(jedisPool, 8081, 5000);
+			CommandsReporter cr = new CommandsReporter(jedisPool, 8081, 2000);
 			executor.submit(cr);
 			
 			Scanner scan = new Scanner(System.in);

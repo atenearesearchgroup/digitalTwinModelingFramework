@@ -19,6 +19,9 @@ public class DriveForward extends CarBehavior{
 
 	public void action() {
 		super.action();
-		c.getPilot().travel(1);
+		System.out.println("buenas tardes");
+		c.getPilot().travel(60, true);
+		System.out.println("quetaltodoelmundo");
+		while(c.getPilot().isMoving())Thread.yield();
 	}
 }

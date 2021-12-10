@@ -19,6 +19,7 @@ public class DriveBackward extends CarBehavior{
 
 	public void action() {
 		super.action();
-		c.getPilot().travel(-1);
+		c.getPilot().travel(-60);
+		while(c.getPilot().isMoving())Thread.yield();
 	}
 }

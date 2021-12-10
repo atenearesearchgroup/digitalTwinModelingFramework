@@ -62,7 +62,7 @@ public abstract class Car {
 		RegulatedMotor leftMotor = PilotProps.getMotor(pp.getProperty(PilotProps.KEY_LEFTMOTOR, this.LEFT_MOTOR));
 		RegulatedMotor rightMotor = PilotProps.getMotor(pp.getProperty(PilotProps.KEY_RIGHTMOTOR, this.RIGHT_MOTOR));
 		boolean reverse = Boolean.parseBoolean(pp.getProperty(PilotProps.KEY_REVERSE, this.REVERSE));
-
+		
 		this.pilot = new DifferentialPilot(wheelDiameter, trackWidth, leftMotor, rightMotor, reverse);
 		this.pilot.setRotateSpeed(50);
 		this.pilot.setTravelSpeed(3);
@@ -75,15 +75,15 @@ public abstract class Car {
 		(new Arbitrator(getBehaviors())).start();
 	}
 
-	public void addToQueue(String command) {
+	public synchronized void addToQueue(String command) {
 		commands.add(command);
 	}
 
-	public void execute() {
+	public synchronized void execute() {
 		commands.remove(0);
 	}
 	
-	public boolean commandsIsEmpty() {
+	public synchronized boolean commandsIsEmpty() {
 		return this.commands.isEmpty();
 	}
 	
@@ -115,7 +115,7 @@ public abstract class Car {
 		return behaviors;
 	}
 
-	public void setBehaviors(Behavior[] behaviors) {
+	public synchronized void setBehaviors(Behavior[] behaviors) {
 		this.behaviors = behaviors;
 	}
 
@@ -123,7 +123,7 @@ public abstract class Car {
 		return poseProvider;
 	}
 
-	public void setActiveBehavior(String activeBehavior) {
+	public synchronized void setActiveBehavior(String activeBehavior) {
 		this.activeBehavior = activeBehavior;
 	}
 

@@ -33,7 +33,7 @@ public class CarMain {
 		SensorReporter sr = new SensorReporter(car, 8080, 5000);
 		threadManager.submit(sr);
 			
-		CommandsReceiver cr = new CommandsReceiver(8081, car, 5000);
+		CommandsReceiver cr = new CommandsReceiver(8081, car, 2000);
 		threadManager.submit(cr);		
 		
 		car.startBehaving();

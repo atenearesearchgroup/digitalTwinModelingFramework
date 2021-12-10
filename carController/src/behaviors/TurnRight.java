@@ -19,7 +19,7 @@ public class TurnRight extends CarBehavior{
 
 	public void action() {
 		super.action();
-		c.getPilot().rotate(90);
+		c.getPilot().rotate(-90);
 		Thread.yield(); // action complete when not on line
 	}
 }

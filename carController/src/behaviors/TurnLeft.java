@@ -19,7 +19,9 @@ public class TurnLeft extends CarBehavior{
 
 	public void action() {
 		super.action();
-		c.getPilot().rotate(-90);
+		System.out.println("buenas tardes  a la ziquiera");
+		c.getPilot().rotate(90);
+		System.out.println("hatsa mañana");
 		Thread.yield(); // action complete when not on line
 	}
 }
