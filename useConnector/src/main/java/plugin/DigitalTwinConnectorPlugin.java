@@ -3,7 +3,6 @@ package plugin;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.antlr.runtime.tree.CommonTreeAdaptor;
 import org.tzi.use.api.UseSystemApi;
 import org.tzi.use.runtime.gui.IPluginAction;
 import org.tzi.use.runtime.gui.IPluginActionDelegate;
