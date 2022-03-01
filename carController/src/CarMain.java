@@ -1,11 +1,11 @@
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import bluetooth.BluetoothConnector;
 import car.Car;
-import car.LineFollowerCar;
 import car.RemoteControlledCar;
 import lejos.util.PilotProps;
 import reporter.CommandsReceiver;
@@ -28,13 +28,14 @@ public class CarMain {
 
 		//Car car = new LineFollowerCar();
 		Car car = new RemoteControlledCar();
-		
-		ExecutorService threadManager = Executors.newFixedThreadPool(2);		
-		SensorReporter sr = new SensorReporter(car, 8080, 5000);
-		threadManager.submit(sr);
+
+		ScheduledExecutorService threadScheduler = Executors.newScheduledThreadPool(2);
+
+		SensorReporter sr = new SensorReporter(car, 8080);
+		threadScheduler.scheduleAtFixedRate(sr, 0, 5000, TimeUnit.MILLISECONDS);
 			
-		CommandsReceiver cr = new CommandsReceiver(8081, car, 2000);
-		threadManager.submit(cr);		
+		CommandsReceiver cr = new CommandsReceiver(8081, car);
+		threadScheduler.scheduleAtFixedRate(cr, 0, 2000, TimeUnit.MILLISECONDS);
 		
 		car.startBehaving();
 		

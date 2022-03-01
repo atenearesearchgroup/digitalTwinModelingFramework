@@ -38,24 +38,20 @@ public class SensorReporter implements Runnable {
 	private Socket client;
 	private int port;
 	private boolean running;
-	private int sleepTime;
 
-	public SensorReporter(Car car, int port, int sleepTime) throws UnknownHostException, IOException {
+	public SensorReporter(Car car, int port) throws UnknownHostException, IOException {
 		this.car = car;
 		this.running = true;
-		this.sleepTime = sleepTime;
 		this.port = port;
 		this.client = new Socket("localhost", this.port);
 	}
 
+	// TODO: revisar el papel que tienen los buffers en la ejecución, porque causan excepciones
 	public void run() {
 		try {
 			BufferedWriter bf = new BufferedWriter(new OutputStreamWriter(this.client.getOutputStream()));
 			String firstTimestamp = Long.toString(Instant.now().getEpochSecond());
 			boolean first = true;
-
-			while (running) {
-				Thread.sleep(sleepTime);
 
 				StringBuilder snapshot = new StringBuilder();
 				snapshot.append("{");
@@ -118,7 +114,7 @@ public class SensorReporter implements Runnable {
 				System.out.println("[INFO-PT-Reporter] " + snapshot.toString());
 				bf.write(snapshot.toString());
 				bf.flush();
-			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

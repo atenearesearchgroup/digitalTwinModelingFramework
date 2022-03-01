@@ -16,18 +16,16 @@ public class CommandsReporter implements Runnable {
 	private final String COMMANDS_LIST = "commands";
 	private final int TRIAL_THRESHOLD = 200;
 
-	private JedisPool jedisPool;
+	private final JedisPool jedisPool;
 	private Socket client;
-	private int port;
+	private final int port;
 	private boolean running;
-	private int sleepTime;
 
-	public CommandsReporter(JedisPool jedisPool, int port, int sleepTime) throws IOException {
+	public CommandsReporter(JedisPool jedisPool, int port) throws IOException {
 		this.jedisPool = jedisPool;
 		this.running = true;
 		this.port = port;
-		this.sleepTime = sleepTime;
-		
+
 		try {
 			connectToServer();
 		} catch (Exception e) {
@@ -35,9 +33,9 @@ public class CommandsReporter implements Runnable {
 		} 
 	}
 
+	// TODO: revisar el papel que tienen los buffers en la ejecución, porque causan excepciones
 	@Override
 	public void run() {
-		while (running) {
 			Jedis jedis = jedisPool.getResource();
 			Set<String> commands = getUnprocessedCommands(jedis);
 			if (!commands.isEmpty()) {
@@ -61,24 +59,18 @@ public class CommandsReporter implements Runnable {
 				System.out.println("[INFO-PT-CommandsReporter] No new commands.");
 			}
 			jedisPool.returnResource(jedis);
-			try {
-				Thread.sleep(this.sleepTime);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+
 	}
 
 	public Set<String> getUnprocessedCommands(Jedis jedis) {
-		Set<String> unprocessedCommands = jedis.zrangeByLex(COMMANDS_LIST, "[0:0", "(1");
-		return unprocessedCommands;
+		return jedis.zrangeByLex(COMMANDS_LIST, "[0:0", "(1");
 	}
 
 	public void stop() {
 		this.running = false;
 	}
 
-	public void connectToServer() throws UnknownHostException, IOException, InterruptedException {
+	public void connectToServer() throws IOException, InterruptedException {
 		int retryCounter = 0;
 		this.client = null;
 

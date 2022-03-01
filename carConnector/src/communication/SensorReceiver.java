@@ -1,18 +1,17 @@
 package communication;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
 /**
  * 
@@ -23,32 +22,28 @@ public class SensorReceiver implements Runnable {
 
 	private final String PROCESSING_QUEUE = "processingQueue";
 	private final String PHYSICAL_TWIN = "physical_twin";
-	
-	private final Map<String, String> attributes;
 	private final String SNAPSHOT_ID = "snapshotId";
 	private final String STRING = "str";
 	private final String NUMBER = "double";
 
-	private JedisPool jedisPool;
-	private ServerSocket server;
-	private int port;
+	private final Map<String, String> attributes;
+
+	private final JedisPool jedisPool;
+	private final ServerSocket server;
+	private final int port;
 	private boolean running;
-	private int sleepTime;
-	
+
 	/**
 	 * Default constructor
 	 * 
 	 * @param jedisPool		Jedis client pool, connected to the Data Lake
 	 * @param port			Port to deploy the server socket
-	 * @throws UnknownHostException
-	 * @throws IOException
 	 */
-	public SensorReceiver(JedisPool jedisPool, int port, int sleepTime) throws UnknownHostException, IOException {
+	public SensorReceiver(JedisPool jedisPool, int port) throws IOException {
 		this.jedisPool = jedisPool;
 		this.running = true;
 		this.port = port;
 		this.server = new ServerSocket(this.port);
-		this.sleepTime = sleepTime;
 		
 		this.attributes = new HashMap<>();
 		
@@ -73,15 +68,14 @@ public class SensorReceiver implements Runnable {
 	/**
 	 * This method runs in the background, receiving information from the Physical Twin and storing it into the Data Lake.
 	 */
+	// TODO: revisar el papel que tienen los buffers en la ejecución, porque causan excepciones
 	public void run() {
-		while (running) {
 			try {
 				Socket connection = server.accept();
 				System.out.println("[INFO-PT] THE CLIENT " + connection.getInetAddress() + ":" + connection.getPort()
 						+ " IS CONNECTED ");
 
 				BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-				while (running) {
 					if(inFromClient.ready()) {
 						Jedis jedis = jedisPool.getResource();
 						String message = inFromClient.readLine();
@@ -93,7 +87,7 @@ public class SensorReceiver implements Runnable {
 						String snapshotId = snapshot.get(SNAPSHOT_ID).toString();
 						
 						for(String attribute : attributes.keySet()) {
-							String value = snapshot.get(attribute).toString().replace(',', '.');;
+							String value = snapshot.get(attribute).toString().replace(',', '.');
 							System.out.println("[INFO-PT-Reception] " + attribute + ": " + value);
 							sensorValues.put(attribute, value);
 							if(attributes.get(attribute).equals(NUMBER)) {							
@@ -114,13 +108,11 @@ public class SensorReceiver implements Runnable {
 					} else {
 						System.out.println("[INFO-PT] No new snapshots");
 					}
-					Thread.sleep(sleepTime);
-				}
 				connection.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
+
 	}
 
 	private void addSearchRegister(String sensorKey, double score, String registryKey, Jedis jedis) {
@@ -129,7 +121,6 @@ public class SensorReceiver implements Runnable {
 	
 	/**
 	 * This method stops the reception of information from the Physical Twin.
-	 * @throws IOException
 	 */
 	public void stop() throws IOException {
 		this.running = false;

@@ -1,15 +1,15 @@
 package main;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import communication.CommandsReporter;
 import communication.SensorReceiver;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+
+import java.io.IOException;
+import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 
@@ -21,30 +21,19 @@ public class ConnectorMain {
 	public static void  main(String[] args) {
 		JedisPool jedisPool = new JedisPool(new JedisPoolConfig(), "localhost"); 
 		try {
-			ExecutorService executor = Executors.newFixedThreadPool(2);	
+			ScheduledExecutorService threadScheduler = Executors.newScheduledThreadPool(2);
 			
-			SensorReceiver sr = new SensorReceiver(jedisPool, 8080, 5000);
-			executor.submit(sr);
+			SensorReceiver sr = new SensorReceiver(jedisPool, 8080);
+			threadScheduler.scheduleAtFixedRate(sr, 0, 5000, TimeUnit.MILLISECONDS);
 					
-			CommandsReporter cr = new CommandsReporter(jedisPool, 8081, 2000);
-			executor.submit(cr);
+			CommandsReporter cr = new CommandsReporter(jedisPool, 8081);
+			threadScheduler.scheduleAtFixedRate(cr, 0, 2000, TimeUnit.MILLISECONDS);
 			
-			Scanner scan = new Scanner(System.in);
-			System.out.println("Type \"end\" to close the connection and finish the program...");
-			while (true) {
-				if (scan.nextLine().equals("end")) {
-					break;
-				}
-			}
-			
-			cr.stop();
-			sr.stop();
-			scan.close();
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
+			//cr.stop();
+			//sr.stop();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
+		}
 	}
 
 }
