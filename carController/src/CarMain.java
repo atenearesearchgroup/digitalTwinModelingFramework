@@ -34,14 +34,14 @@ public class CarMain {
 		Socket client = connectToServer(8081);
         BufferedWriter outToClient = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
         SensorReporter sr = new SensorReporter(car, outToClient);
-        threadScheduler.scheduleAtFixedRate(sr, 0, 5000, TimeUnit.MILLISECONDS);
+        threadScheduler.scheduleAtFixedRate(sr, 0, 10000, TimeUnit.MILLISECONDS);
 
         ServerSocket commandsServer = new ServerSocket(8080);
         Socket connection = commandsServer.accept();
         System.out.println("[INFO-PT-CommandsReceiver] THE CLIENT " + connection.getInetAddress() + ":" + connection.getPort() + " IS CONNECTED ");
         BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         CommandsReceiver cr = new CommandsReceiver(inFromClient, car);
-        threadScheduler.scheduleAtFixedRate(cr, 0, 2000, TimeUnit.MILLISECONDS);
+        threadScheduler.scheduleAtFixedRate(cr, 0, 20000, TimeUnit.MILLISECONDS);
 
         car.startBehaving();
     }

@@ -109,12 +109,12 @@ public class SensorReporter implements Runnable {
     }
 
     private void processAttribute(StringBuilder snapshot, String attributeKey, String attributeValue) {
-        System.out.println("[INFO-PT-Reporter] " + attributeKey + ": " + attributeValue);
+        //System.out.println("[INFO-PT-Reporter] " + attributeKey + ": " + attributeValue);
         snapshot.append("\"" + attributeKey + "\":\"" + attributeValue + "\",");
     }
 
     private void processLastAttribute(StringBuilder snapshot, String attributeKey, String attributeValue) {
-        System.out.println("[INFO-PT-Reporter] " + attributeKey + ": " + attributeValue);
+        //System.out.println("[INFO-PT-Reporter] " + attributeKey + ": " + attributeValue);
         snapshot.append("\"" + attributeKey + "\":\"" + attributeValue + "\"");
     }
 
