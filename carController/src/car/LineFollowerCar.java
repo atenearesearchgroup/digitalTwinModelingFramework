@@ -28,6 +28,8 @@ public class LineFollowerCar extends Car {
 		offLineBehav = new OffLine(this);
 		driveForwardBehav = new DriveOnLine(this);
 		remoteControlBehav = new RemoteControl(this);
-		this.setBehaviors(new Behavior[]{this.offLineBehav, this.driveForwardBehav, this.remoteControlBehav});
+		this.setBehaviors(new Behavior[]{this.offLineBehav, this.driveForwardBehav});
+		// If you want the car to receiver commands:
+		// this.setBehaviors(new Behavior[]{this.offLineBehav, this.driveForwardBehav, this.remoteControlBehav});
 	}
 }
