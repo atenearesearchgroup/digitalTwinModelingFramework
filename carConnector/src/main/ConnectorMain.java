@@ -34,7 +34,7 @@ public class ConnectorMain {
 
 			Socket client = connectToServer(8080);
             CommandsReporter cr = new CommandsReporter(jedisPool, client);
-            threadScheduler.scheduleAtFixedRate(cr, 0, 2000, TimeUnit.MILLISECONDS);
+            threadScheduler.scheduleAtFixedRate(cr, 0, 20000, TimeUnit.MILLISECONDS);
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();

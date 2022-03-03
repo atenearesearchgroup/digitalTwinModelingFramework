@@ -20,12 +20,9 @@ public class DriveOnLine extends CarBehavior{
 
 	public void action() {
 		super.action();
-		while(!suppress){
-			c.getPilot().forward();
-			while (c.getLight().readValue() <= 40)
-				Thread.yield(); // action complete when not on line
-		}
+		c.getPilot().forward();
+		while (c.getLight().readValue() <= 40)
+			Thread.yield(); // action complete when not on line
 		c.getPilot().stop();
-		suppress = false;
 	}
 }
