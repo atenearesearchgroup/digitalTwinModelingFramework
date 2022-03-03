@@ -71,7 +71,6 @@ public abstract class Car {
 	}
 
 	public void startBehaving() {
-		LCD.drawString("Line ", 0, 1);
 		(new Arbitrator(getBehaviors())).start();
 	}
 
