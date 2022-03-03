@@ -31,11 +31,13 @@ public class CarMain {
 
         ScheduledExecutorService threadScheduler = Executors.newScheduledThreadPool(2);
 
+		/*SENSOR REPORTER*/
 		Socket client = connectToServer(8081);
         BufferedWriter outToClient = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
         SensorReporter sr = new SensorReporter(car, outToClient);
         threadScheduler.scheduleAtFixedRate(sr, 0, 10000, TimeUnit.MILLISECONDS);
 
+		/*COMMANDS RECEIVER*/
         ServerSocket commandsServer = new ServerSocket(8080);
         Socket connection = commandsServer.accept();
         System.out.println("[INFO-PT-CommandsReceiver] THE CLIENT " + connection.getInetAddress() + ":" + connection.getPort() + " IS CONNECTED ");
@@ -43,6 +45,7 @@ public class CarMain {
         CommandsReceiver cr = new CommandsReceiver(inFromClient, car);
         threadScheduler.scheduleAtFixedRate(cr, 0, 20000, TimeUnit.MILLISECONDS);
 
+		/*CAR BEHAVIOR*/
         car.startBehaving();
     }
 

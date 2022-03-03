@@ -4,14 +4,14 @@ import car.Car;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.time.Instant;
 
 /**
  * @author Paula Mu&ntilde;oz - University of M&atilde;laga
+ *
+ * Sends information from the car's sensors to the computer's server.
+ * TODO: Be able to support a configuration file to define the attributes we want to monitor and their type.
  */
 public class SensorReporter implements Runnable {
 
@@ -109,12 +109,12 @@ public class SensorReporter implements Runnable {
     }
 
     private void processAttribute(StringBuilder snapshot, String attributeKey, String attributeValue) {
-        //System.out.println("[INFO-PT-Reporter] " + attributeKey + ": " + attributeValue);
+        //  System.out.println("[INFO-PT-Reporter] " + attributeKey + ": " + attributeValue);
         snapshot.append("\"" + attributeKey + "\":\"" + attributeValue + "\",");
     }
 
     private void processLastAttribute(StringBuilder snapshot, String attributeKey, String attributeValue) {
-        //System.out.println("[INFO-PT-Reporter] " + attributeKey + ": " + attributeValue);
+        //  System.out.println("[INFO-PT-Reporter] " + attributeKey + ": " + attributeValue);
         snapshot.append("\"" + attributeKey + "\":\"" + attributeValue + "\"");
     }
 

@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import lejos.nxt.LCD;
 import lejos.nxt.LightSensor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.TouchSensor;
@@ -41,11 +40,11 @@ public abstract class Car {
 
 	private String activeBehavior;
 
-	protected List<String> commands;
+	protected List<String> incomingCommands;
 
 	public Car() throws IOException {
-		/* COMMANDS */
-		this.commands = new LinkedList<>();
+		/* 	INCOMING COMMANDS */
+		this.incomingCommands = new LinkedList<>();
 
 		/* SENSORS */
 		this.light = new LightSensor(SensorPort.S3);
@@ -75,19 +74,19 @@ public abstract class Car {
 	}
 
 	public synchronized void addToQueue(String command) {
-		commands.add(command);
+		incomingCommands.add(command);
 	}
 
 	public synchronized void execute() {
-		commands.remove(0);
+		incomingCommands.remove(0);
 	}
 	
 	public synchronized boolean commandsIsEmpty() {
-		return this.commands.isEmpty();
+		return this.incomingCommands.isEmpty();
 	}
 	
 	public List<String> commands(){
-		return Collections.unmodifiableList(this.commands);
+		return Collections.unmodifiableList(this.incomingCommands);
 	}
 
 	public LightSensor getLight() {
