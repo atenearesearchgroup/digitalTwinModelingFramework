@@ -6,16 +6,19 @@ import redis.clients.jedis.JedisPool;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.net.ConnectException;
 import java.net.Socket;
 import java.util.Set;
 
+/**
+ * @author Paula Mu&ntilde;oz - University of M&atilde;laga
+ * Sends the commands detected in the database to the car server.
+ */
 public class CommandsReporter implements Runnable {
 
     private final String COMMANDS_LIST = "commands";
 
     private final JedisPool jedisPool;
-    private Socket client;
+    private final Socket client;
 
     public CommandsReporter(JedisPool jedisPool, Socket client) throws IOException {
         this.jedisPool = jedisPool;
@@ -52,7 +55,6 @@ public class CommandsReporter implements Runnable {
     public Set<String> getUnprocessedCommands(Jedis jedis) {
         return jedis.zrangeByLex(COMMANDS_LIST, "[0:0", "(1");
     }
-
 
 
 }

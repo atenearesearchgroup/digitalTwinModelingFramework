@@ -12,11 +12,11 @@ import java.io.BufferedReader;
 public class CommandsReceiver implements Runnable {
 
     private final BufferedReader inFromClient;
-    private final Car c;
+    private final Car car;
 
     public CommandsReceiver(BufferedReader inFromClient, Car c) {
         this.inFromClient = inFromClient;
-        this.c = c;
+        this.car = c;
     }
 
     public void run() {
@@ -24,7 +24,7 @@ public class CommandsReceiver implements Runnable {
             if (inFromClient.ready()) {
                 String message = inFromClient.readLine();
                 System.out.println("[INFO-PT-CommandsReceiver] " + message);
-                c.addToQueue(message);
+                car.addToQueue(message);
             } else {
                 System.out.println("[INFO-PT-CommandsReceiver] No new commands.");
             }

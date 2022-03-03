@@ -25,6 +25,7 @@ public class ConnectorMain {
         try {
             ScheduledExecutorService threadScheduler = Executors.newScheduledThreadPool(2);
 
+            /*SENSOR RECEIVER*/
             ServerSocket sensorServer = new ServerSocket(8081);
             Socket connection = sensorServer.accept();
             System.out.println("[INFO-PT-SensorReceiver] THE CLIENT " + connection.getInetAddress() + ":" + connection.getPort() + " IS CONNECTED ");
@@ -32,14 +33,15 @@ public class ConnectorMain {
             SensorReceiver sr = new SensorReceiver(jedisPool, inFromClient);
             threadScheduler.scheduleAtFixedRate(sr, 0, 5000, TimeUnit.MILLISECONDS);
 
-			Socket client = connectToServer(8080);
+            /*COMMAND REPORTER*/
+            Socket client = connectToServer(8080);
             CommandsReporter cr = new CommandsReporter(jedisPool, client);
             threadScheduler.scheduleAtFixedRate(cr, 0, 20000, TimeUnit.MILLISECONDS);
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-	}
+    }
 
     private static Socket connectToServer(int port) throws IOException, InterruptedException {
         int retryCounter = 0;

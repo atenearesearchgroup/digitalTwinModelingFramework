@@ -7,14 +7,14 @@ import redis.clients.jedis.JedisPool;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Paula Mu&ntilde;oz - University of M&atilde;laga
+ * Receives the sensor information sent by the car and stores it in the database.
+ * <p>
+ * TODO: Support a configuration file that determines the format of the information to be received, specifying which attributes we want to receive and store.
  */
 public class SensorReceiver implements Runnable {
 
@@ -29,11 +29,11 @@ public class SensorReceiver implements Runnable {
     private final JedisPool jedisPool;
     private final BufferedReader inFromClient;
 
-	/**
+    /**
      * Default constructor
      *
-     * @param jedisPool Jedis client pool, connected to the Data Lake
-     * @param inFromClient      connection to serverSocket
+     * @param jedisPool    Jedis client pool, connected to the Data Lake
+     * @param inFromClient connection to serverSocket
      */
     public SensorReceiver(JedisPool jedisPool, BufferedReader inFromClient) throws IOException {
         this.jedisPool = jedisPool;
