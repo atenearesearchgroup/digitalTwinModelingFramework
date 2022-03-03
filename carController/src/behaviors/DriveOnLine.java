@@ -2,27 +2,30 @@ package behaviors;
 
 import car.Car;
 
-public class DriveOnLine extends CarBehavior{
+/**
+ * This action moves the car forward as long as it detects a dark line on the ground.
+ */
+public class DriveOnLine extends CarBehavior {
 
-	private boolean suppress = false;
-	
-	public DriveOnLine(Car c) {
-		super("ForwardOnLine", c);
-	}
+    private boolean suppress = false;
 
-	public boolean takeControl() {
-		return c.getLight().readValue() <= 40 && c.commandsIsEmpty();
-	}
+    public DriveOnLine(Car c) {
+        super("ForwardOnLine", c);
+    }
 
-	public void suppress() {
-		suppress = true;
-	}
+    public boolean takeControl() {
+        return car.getLight().readValue() <= 40 && car.commandsIsEmpty();
+    }
 
-	public void action() {
-		super.action();
-		c.getPilot().forward();
-		while (c.getLight().readValue() <= 40)
-			Thread.yield(); // action complete when not on line
-		c.getPilot().stop();
-	}
+    public void suppress() {
+        suppress = true;
+    }
+
+    public void action() {
+        super.action();
+        car.getPilot().forward();
+        while (car.getLight().readValue() <= 40)
+            Thread.yield(); // action complete when not on line
+        car.getPilot().stop();
+    }
 }

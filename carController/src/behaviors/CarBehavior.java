@@ -3,21 +3,24 @@ package behaviors;
 import car.Car;
 import lejos.robotics.subsumption.Behavior;
 
+/**
+ * Template class to define the Car's behaviors
+ */
 public abstract class CarBehavior implements Behavior {
-	public final String ACTION;
+    public final String ACTION;
 
-	protected Car c;
-	
-	public CarBehavior(String action, Car c) {
-		this.ACTION = action;
-		this.c = c;
-	}
-	
-	public void action() {
-		c.setActiveBehavior(ACTION);
-	}
-	
-	public String getACTION() {
-		return ACTION;
-	}
+    protected Car car;
+
+    public CarBehavior(String action, Car car) {
+        this.ACTION = action;
+        this.car = car;
+    }
+
+    public void action() {
+        car.setActiveBehavior(ACTION);
+    }
+
+    public String getACTION() {
+        return ACTION;
+    }
 }
