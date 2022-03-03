@@ -2,24 +2,27 @@ package behaviors;
 
 import car.Car;
 
-public class DriveBackward extends CarBehavior{	
-	
-	public DriveBackward(Car c) {
-		super("Backward", c);
-	}
+/**
+ * This action moves the car backwards.
+ */
+public class DriveBackward extends CarBehavior {
 
-	// It never takes control on its own, since it is a behavior for the remote control
-	public boolean takeControl() {
-		return false;
-	}
+    public DriveBackward(Car c) {
+        super("Backward", c);
+    }
 
-	public void suppress() {
-		c.getPilot().stop();
-	}
+    // It never takes control on its own, since it is a behavior for the remote control
+    public boolean takeControl() {
+        return false;
+    }
 
-	public void action() {
-		super.action();
-		c.getPilot().travel(-60);
-		while(c.getPilot().isMoving())Thread.yield();
-	}
+    public void suppress() {
+        car.getPilot().stop();
+    }
+
+    public void action() {
+        super.action();
+        car.getPilot().travel(-60);
+        while (car.getPilot().isMoving()) Thread.yield();
+    }
 }
