@@ -1,7 +1,5 @@
 package pubsub;
 
-import org.tzi.use.api.UseSystemApi;
-
 import digital.twin.InputSnapshotsManager;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -13,18 +11,17 @@ import redis.clients.jedis.JedisPool;
  */
 public class InPubService extends PubService {
 	
-	private JedisPool jedisPool;
-	private int sleepTime;
+	private final JedisPool jedisPool;
+	private final int sleepTime;
 	private boolean running;
 	
 	/**
 	 * Default constructor
 	 * 
-	 * @param api			USE system API instance to interact with the currently displayed object diagram.
 	 * @param jedisPool		Jedis client pool, connected to the Data Lake
 	 * @param sleepTime		Milliseconds between each check in the database.
 	 */
-	public InPubService(String channel, UseSystemApi api, JedisPool jedisPool, int sleepTime) {
+	public InPubService(String channel, JedisPool jedisPool, int sleepTime) {
 		super(channel);
 		this.jedisPool = jedisPool;
 		this.sleepTime = sleepTime;

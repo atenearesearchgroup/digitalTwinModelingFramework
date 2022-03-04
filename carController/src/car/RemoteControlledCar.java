@@ -19,12 +19,12 @@ import lejos.robotics.subsumption.Behavior;
  */
 public class RemoteControlledCar extends Car {
 
-	private DriveForward forward;
-	private DriveBackward backward;
-	private TurnLeft left;
-	private TurnRight right;
-	private Stop stop;
-	private RemoteControl remoteControlBehav;
+	private final DriveForward forward;
+	private final DriveBackward backward;
+	private final TurnLeft left;
+	private final TurnRight right;
+	private final Stop stop;
+	private final RemoteControl remoteControlBehav;
 
 	/**
 	 * Default constructor

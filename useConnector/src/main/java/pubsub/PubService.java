@@ -1,7 +1,7 @@
 package pubsub;
 
 public abstract class PubService implements Runnable {
-	private String channel;
+	private final String channel;
 	
 	public PubService(String channel) {
 		this.channel = channel;

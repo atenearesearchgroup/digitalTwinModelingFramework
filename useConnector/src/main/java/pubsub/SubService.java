@@ -12,9 +12,9 @@ import redis.clients.jedis.JedisPool;
  */
 public class SubService implements Runnable {
 	
-	private UseSystemApi api;
-	private JedisPool jedisPool;
-	private String subscribedChannel;
+	private final UseSystemApi api;
+	private final JedisPool jedisPool;
+	private final String subscribedChannel;
 	
 	/**
 	 * Default constructor

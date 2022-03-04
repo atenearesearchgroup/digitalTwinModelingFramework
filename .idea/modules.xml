@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/0000 - FM DT.iml" filepath="$PROJECT_DIR$/.idea/0000 - FM DT.iml" />
       <module fileurl="file://$PROJECT_DIR$/tracesMonitoring/analysisTracesMonitoring.iml" filepath="$PROJECT_DIR$/tracesMonitoring/analysisTracesMonitoring.iml" />
       <module fileurl="file://$PROJECT_DIR$/carConnector/carConnector.iml" filepath="$PROJECT_DIR$/carConnector/carConnector.iml" />
       <module fileurl="file://$PROJECT_DIR$/carController/carController.iml" filepath="$PROJECT_DIR$/carController/carController.iml" />

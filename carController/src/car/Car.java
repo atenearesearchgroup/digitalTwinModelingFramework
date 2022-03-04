@@ -29,13 +29,13 @@ public abstract class Car {
 	public final String LEFT_MOTOR = "C";
 	public final String REVERSE = "false";
 
-	private LightSensor light;
-	private UltrasonicSensor ultrasonic;
-	private TouchSensor touchLeft;
-	private TouchSensor touchRight;
+	private final LightSensor light;
+	private final UltrasonicSensor ultrasonic;
+	private final TouchSensor touchLeft;
+	private final TouchSensor touchRight;
 
-	private RotateMoveController pilot;
-	private OdometryPoseProvider poseProvider;
+	private final RotateMoveController pilot;
+	private final OdometryPoseProvider poseProvider;
 	private Behavior[] behaviors;
 
 	private String activeBehavior;

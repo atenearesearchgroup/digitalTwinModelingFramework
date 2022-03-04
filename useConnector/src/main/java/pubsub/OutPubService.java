@@ -13,11 +13,11 @@ import redis.clients.jedis.JedisPool;
  */
 public class OutPubService extends PubService {
 	
-	private UseSystemApi api;
-	private JedisPool jedisPool;
-	private int sleepTime;
+	private final UseSystemApi api;
+	private final JedisPool jedisPool;
+	private final int sleepTime;
 	private boolean running;
-	private OutputManager output;
+	private final OutputManager output;
 	
 	/**
 	 * Default constructor

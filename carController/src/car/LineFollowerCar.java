@@ -13,9 +13,9 @@ import lejos.robotics.subsumption.Behavior;
  */
 public class LineFollowerCar extends Car {
 	
-	private OffLine offLineBehav;
-	private DriveOnLine driveForwardBehav;
-	private RemoteControl remoteControlBehav;
+	private final OffLine offLineBehav;
+	private final DriveOnLine driveForwardBehav;
+	private final RemoteControl remoteControlBehav;
 	
 
 	/**
