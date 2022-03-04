@@ -25,9 +25,7 @@
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="inheritedJdk" />
-    <orderEntry type="library" name="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER" level="application" />
-    <orderEntry type="module" module-name="use" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library name="use.jar">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/use.jar!/" />
@@ -36,7 +34,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library name="commons-pool2-2.9.0.jar">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/commons-pool2-2.9.0.jar!/" />
@@ -45,7 +43,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library name="jedis-3.6.0.jar">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/jedis-3.6.0.jar!/" />
@@ -54,7 +52,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library name="slf4j-api-1.7.30.jar">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/slf4j-api-1.7.30.jar!/" />
@@ -63,7 +61,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library name="use-runtime.jar">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/use-runtime.jar!/" />
