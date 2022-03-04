@@ -21,8 +21,8 @@ public abstract class OutputManager {
     protected final String NUMBER = "double";
     protected final String BOOLEAN = "boolean";
     protected String retrievedClass;
-    private String channel;
     protected String identifier;
+    private String channel;
 
     public OutputManager() {
         this.attributes = new HashMap<>();
@@ -68,7 +68,7 @@ public abstract class OutputManager {
      *
      * @param attributes    Map with the attributes and its values.
      * @param attributeName Name of the attribute whose value is retrieved.
-     * @return
+     * @return The corresponding attribute value
      */
     protected String getAttribute(Map<MAttribute, Value> attributes, String attributeName) {
         for (MAttribute snapshotKey : attributes.keySet()) {
@@ -82,13 +82,13 @@ public abstract class OutputManager {
     /**
      * Auxiliary method to store the attributes in the database, extracted from the diagram.
      *
-     * @param api
-     * @param jedis
-     * @param snapshot
-     * @param carValues
-     * @param snapshotAttributes
-     * @param snapshotId
-     * @throws UseApiException
+     * @param api                USE system API instance to interact with the currently displayed object diagram.
+     * @param jedis              An instance of the Jedis client to access the data lake.
+     * @param snapshot           An instance of the Snapshot Object retrieved from USE
+     * @param carValues          List with the attributes retrieved from the Snapshot
+     * @param snapshotAttributes List with the name of the attributes in the snapshot class
+     * @param snapshotId         Snapshot identifier
+     * @throws UseApiException Any error related to the USE API
      */
     protected void saveAttributes(UseSystemApi api, Jedis jedis, MObjectState snapshot, Map<String, String> carValues, Map<MAttribute, Value> snapshotAttributes, String snapshotId) throws UseApiException {
         carValues.put(SNAPSHOT_ID, snapshotId);
