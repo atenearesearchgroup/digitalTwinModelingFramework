@@ -18,9 +18,10 @@ import java.util.Map;
  */
 public class SensorReceiver implements Runnable {
 
-    private final String PROCESSING_QUEUE = "processingQueue";
+    private final String PROCESSING_QUEUE = "PROCESSING_QUEUE_LIST";
     private final String PHYSICAL_TWIN = "physical_twin";
     private final String SNAPSHOT_ID = "snapshotId";
+    private final String EXECUTION_ID = "executionId";
     private final String STRING = "str";
     private final String NUMBER = "double";
 
@@ -43,8 +44,8 @@ public class SensorReceiver implements Runnable {
 
         attributes.put("twinId", STRING);
         attributes.put("timestamp", NUMBER);
-        attributes.put("executionId", NUMBER);
-        attributes.put("snapshotId", STRING);
+        attributes.put(EXECUTION_ID, NUMBER);
+        attributes.put(SNAPSHOT_ID, STRING);
 
         attributes.put("xPos", NUMBER);
         attributes.put("yPos", NUMBER);
@@ -73,13 +74,14 @@ public class SensorReceiver implements Runnable {
                 JSONParser parser = new JSONParser();
                 JSONObject snapshot = (JSONObject) parser.parse(message);
                 String snapshotId = snapshot.get(SNAPSHOT_ID).toString();
+                String executionID = snapshot.get(EXECUTION_ID).toString();
 
                 for (String attribute : attributes.keySet()) {
                     String value = snapshot.get(attribute).toString().replace(',', '.');
                     System.out.println("[INFO-PT-SensorReceiver] " + attribute + ": " + value);
                     sensorValues.put(attribute, value);
                     if (attributes.get(attribute).equals(NUMBER)) {
-                        addSearchRegister(attribute, Double.parseDouble(value), snapshotId, jedis);
+                        addSearchRegister(attribute, Double.parseDouble(value), snapshotId, jedis, executionID);
                     }
                 }
 
@@ -89,7 +91,7 @@ public class SensorReceiver implements Runnable {
 
                 int physicalTwin = 1;
                 sensorValues.put(PHYSICAL_TWIN, Integer.toString(physicalTwin));
-                addSearchRegister(PHYSICAL_TWIN, physicalTwin, snapshotId, jedis);
+                addSearchRegister(PHYSICAL_TWIN, physicalTwin, snapshotId, jedis, executionID);
 
                 jedis.hset(snapshotId, sensorValues);
                 jedisPool.returnResource(jedis);
@@ -102,8 +104,8 @@ public class SensorReceiver implements Runnable {
 
     }
 
-    private void addSearchRegister(String sensorKey, double score, String registryKey, Jedis jedis) {
-        jedis.zadd(sensorKey.toUpperCase() + "_LIST", score, registryKey);
+    private void addSearchRegister(String sensorKey, double score, String registryKey, Jedis jedis, String executionId) {
+        jedis.zadd(executionId + ":" + sensorKey.toUpperCase() + "_LIST", score, registryKey);
     }
 
 }

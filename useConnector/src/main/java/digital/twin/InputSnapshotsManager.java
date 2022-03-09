@@ -14,7 +14,7 @@ import java.util.Set;
  */
 public class InputSnapshotsManager {
 
-    private final static String PROCESSING_QUEUE_LIST = "processingQueueList";
+    private final static String PROCESSING_QUEUE_LIST = "PROCESSING_QUEUE_LIST";
 
     /**
      * Method to retrieve the list of unprocessed input snapshots from the database.
