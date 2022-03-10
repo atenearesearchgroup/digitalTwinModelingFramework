@@ -17,6 +17,8 @@ import lejos.robotics.navigation.RotateMoveController;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
 import lejos.util.PilotProps;
+import taco.TachoPose;
+import taco.TachoPoseProvider;
 
 /**
  * 
@@ -36,7 +38,7 @@ public abstract class Car {
 	private final TouchSensor touchRight;
 
 	private final RotateMoveController pilot;
-	private final OdometryPoseProvider poseProvider;
+	private final TachoPoseProvider poseProvider;
 	private Behavior[] behaviors;
 
 	private String activeBehavior;
@@ -67,9 +69,8 @@ public abstract class Car {
 		this.pilot.setRotateSpeed(50);
 		this.pilot.setTravelSpeed(3);
 
-		this.poseProvider = new OdometryPoseProvider(this.pilot);
-		Pose initialPosition = new Pose(); // Position (0, 0) looking to the positive direction of the X axis
-		this.poseProvider.setPose(initialPosition);
+		TachoPose tc = new TachoPose();
+		this.poseProvider = new TachoPoseProvider(tc, this, leftMotor, rightMotor);
 	}
 
 	public void startBehaving() {
@@ -120,7 +121,7 @@ public abstract class Car {
 		this.behaviors = behaviors;
 	}
 
-	public OdometryPoseProvider getPoseProvider() {
+	public TachoPoseProvider getPoseProvider() {
 		return poseProvider;
 	}
 
