@@ -12,6 +12,7 @@ import lejos.nxt.UltrasonicSensor;
 import lejos.robotics.RegulatedMotor;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.navigation.DifferentialPilot;
+import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.RotateMoveController;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
@@ -67,6 +68,8 @@ public abstract class Car {
 		this.pilot.setTravelSpeed(3);
 
 		this.poseProvider = new OdometryPoseProvider(this.pilot);
+		Pose initialPosition = new Pose(); // Position (0, 0) looking to the positive direction of the X axis
+		this.poseProvider.setPose(initialPosition);
 	}
 
 	public void startBehaving() {

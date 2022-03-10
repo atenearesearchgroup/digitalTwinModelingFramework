@@ -35,6 +35,7 @@ public class SensorReceiver implements Runnable {
      *
      * @param jedisPool    Jedis client pool, connected to the Data Lake
      * @param inFromClient connection to serverSocket
+     * TODO: Add configuration file to set the type of the attributes
      */
     public SensorReceiver(JedisPool jedisPool, BufferedReader inFromClient) throws IOException {
         this.jedisPool = jedisPool;
@@ -73,25 +74,25 @@ public class SensorReceiver implements Runnable {
 
                 JSONParser parser = new JSONParser();
                 JSONObject snapshot = (JSONObject) parser.parse(message);
-                String snapshotId = snapshot.get(SNAPSHOT_ID).toString();
-                String executionID = snapshot.get(EXECUTION_ID).toString();
+                String snapshotId = "PT:" + snapshot.get(SNAPSHOT_ID).toString();
+                String executionId = snapshotId.substring(0, snapshotId.lastIndexOf(":"));
 
                 for (String attribute : attributes.keySet()) {
                     String value = snapshot.get(attribute).toString().replace(',', '.');
                     System.out.println("[INFO-PT-SensorReceiver] " + attribute + ": " + value);
                     sensorValues.put(attribute, value);
                     if (attributes.get(attribute).equals(NUMBER)) {
-                        addSearchRegister(attribute, Double.parseDouble(value), snapshotId, jedis, executionID);
+                        addSearchRegister(attribute, Double.parseDouble(value), snapshotId, jedis, executionId);
                     }
                 }
 
                 int processingQueue = 0;
                 sensorValues.put(PROCESSING_QUEUE, Integer.toString(processingQueue));
-                jedis.zadd(PROCESSING_QUEUE + "List", processingQueue, 0 + ":" + snapshotId);
+                jedis.zadd(executionId + ":" + PROCESSING_QUEUE + "_LIST", processingQueue, 0 + ":" + snapshotId);
 
                 int physicalTwin = 1;
                 sensorValues.put(PHYSICAL_TWIN, Integer.toString(physicalTwin));
-                addSearchRegister(PHYSICAL_TWIN, physicalTwin, snapshotId, jedis, executionID);
+                addSearchRegister(PHYSICAL_TWIN, physicalTwin, snapshotId, jedis, executionId);
 
                 jedis.hset(snapshotId, sensorValues);
                 jedisPool.returnResource(jedis);

@@ -59,8 +59,8 @@ public abstract class OutputManager {
      * @param registryKey Snapshot Id
      * @param jedis       An instance of the Jedis client to access the data lake.
      */
-    protected void addSearchRegister(String sensorKey, double score, String registryKey, Jedis jedis) {
-        jedis.zadd("DT_" + sensorKey + "_LIST", score, registryKey);
+    protected void addSearchRegister(String sensorKey, double score, String registryKey, Jedis jedis, String executionId) {
+        jedis.zadd(executionId + ":" + sensorKey.toUpperCase() + "_LIST", score, registryKey);
     }
 
     /**
@@ -92,15 +92,16 @@ public abstract class OutputManager {
      */
     protected void saveAttributes(UseSystemApi api, Jedis jedis, MObjectState snapshot, Map<String, String> carValues, Map<MAttribute, Value> snapshotAttributes, String snapshotId) throws UseApiException {
         carValues.put(SNAPSHOT_ID, snapshotId);
+        String executionId = snapshotId.substring(0, snapshotId.lastIndexOf(":"));
 
         for (String att : this.attributes.keySet()) {
             String attributeValue = getAttribute(snapshotAttributes, att);
             System.out.println("[INFO-DT-Output] " + att + ": " + attributeValue);
             carValues.put(att, attributeValue);
             if (attributes.get(att).equals(NUMBER)) {
-                addSearchRegister(att, Double.parseDouble(attributeValue.replace("'", "")), snapshotId, jedis);
+                addSearchRegister(att, Double.parseDouble(attributeValue.replace("'", "")), snapshotId, jedis, executionId);
             } else if (attributes.get(att).equals(BOOLEAN)) {
-                addSearchRegister(att, Boolean.parseBoolean(attributeValue) ? 1 : 0, snapshotId, jedis);
+                addSearchRegister(att, Boolean.parseBoolean(attributeValue) ? 1 : 0, snapshotId, jedis, executionId);
             }
         }
 
