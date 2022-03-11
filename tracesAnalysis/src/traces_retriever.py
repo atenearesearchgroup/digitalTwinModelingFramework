@@ -2,7 +2,7 @@ import redis
 import matplotlib.pyplot as plt
 import numpy as np
 
-execution_id = "1646935565"
+execution_id = "1646999743"
 
 r = redis.Redis(host="localhost", port=6379)
 snapshots = r.zrange("PT:NXJCar:" + execution_id + ":EXECUTIONID_LIST", 0, -1, False)

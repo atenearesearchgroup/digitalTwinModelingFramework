@@ -23,6 +23,8 @@ public class TachoPoseProvider {
         double tw = Double.parseDouble(this.c.TRACK_WIDTH);
         this._left = left;
         this._right = right;
+        this._left.resetTachoCount();
+        this._right.resetTachoCount();
         lastTachoPose = tachoPose;
         _leftTC = tachoPose.getLeftTC();
         _rightTC = tachoPose.getRightTC();
