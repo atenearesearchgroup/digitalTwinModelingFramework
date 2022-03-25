@@ -15,12 +15,10 @@ public class TachoPoseProvider {
     private final float _rightDegPerDistance;
     private final float _rightTurnRatio;
     private final float _leftTurnRatio;
-    private final Car c;
 
     public TachoPoseProvider(TachoPose tachoPose, Car c, RegulatedMotor left, RegulatedMotor right) {
-        this.c = c;
-        double wd = Double.parseDouble(this.c.WHEEL_DIAMETER);
-        double tw = Double.parseDouble(this.c.TRACK_WIDTH);
+        double wd = Double.parseDouble(c.WHEEL_DIAMETER);
+        double tw = Double.parseDouble(c.TRACK_WIDTH);
         this._left = left;
         this._right = right;
         this._left.resetTachoCount();
@@ -28,7 +26,7 @@ public class TachoPoseProvider {
         lastTachoPose = tachoPose;
         _leftTC = tachoPose.getLeftTC();
         _rightTC = tachoPose.getRightTC();
-        _leftDegPerDistance = (float) (360 / (Math.PI * wd));
+        _leftDegPerDistance = (float) (360 / (Math.PI * wd)); // 360 degrees / wheel longitude
         _rightDegPerDistance = (float) (360 / (Math.PI * wd));
         _leftTurnRatio = (float) (tw / wd);
         _rightTurnRatio = (float) (tw / wd);
@@ -83,11 +81,11 @@ public class TachoPoseProvider {
     public float getMovementIncrement() {
         float left = (getLeftCount() - _leftTC) / _leftDegPerDistance;
         float right = (getRightCount() - _rightTC) / _rightDegPerDistance;
-        return /* _parity * */(left + right) / 2.0f;
+        return (left + right) / 2.0f;
     }
 
     public float getAngleIncrement() {
-        return /* _parity * */(((getRightCount() - _rightTC) / _rightTurnRatio) - ((getLeftCount() - _leftTC) / _leftTurnRatio)) / 2.0f;
+        return (((getRightCount() - _rightTC) / _rightTurnRatio) - ((getLeftCount() - _leftTC) / _leftTurnRatio)) / 2.0f;
     }
 
 }
