@@ -1,0 +1,4 @@
+!new Command('c3');
+!c3.twinId := 'NXJCar';
+!c3.action := Action::TurnRight;
+!c3.initialize();

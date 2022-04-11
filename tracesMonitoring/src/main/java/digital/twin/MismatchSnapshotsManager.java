@@ -27,10 +27,10 @@ public class MismatchSnapshotsManager {
 	private final static String INPUT_CAR_SNAPSHOT = "InputCarSnapshot";
 	private final static String OUTPUT_CAR_SNAPSHOT = "OutputCarSnapshot";
 	
-	private String executionId;
-	private String twinId;
-	private UseSystemApi api;
-	private Jedis jedis;
+	private final String executionId;
+	private final String twinId;
+	private final UseSystemApi api;
+	private final Jedis jedis;
 	
 	public MismatchSnapshotsManager(UseSystemApi api, Jedis jedis) {
 		this.api = api;
@@ -66,7 +66,7 @@ public class MismatchSnapshotsManager {
 
 	private void storeObjects(Set<String> snapshots, String objectName, String prefixId, int prefixLength) throws UseApiException {
 		for (String snapshot : snapshots) {
-			String snapshotId = snapshot.substring(prefixLength, snapshot.length());
+			String snapshotId = snapshot.substring(prefixLength);
 			Map<String, String> values = jedis.hgetAll(snapshotId);
 			
 			String snapshotName = prefixId + snapshotId.split(":")[0] + snapshotId.split(":")[2];	

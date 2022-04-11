@@ -1,0 +1,6 @@
+!new Command('c1');
+!c1.twinId := 'NXJCar';
+!c1.action := Action::Forward;
+!c1.initialize();
+
+

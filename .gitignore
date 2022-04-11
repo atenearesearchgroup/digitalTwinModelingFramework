@@ -25,6 +25,7 @@ hs_err_pid*
 /use/
 /*/.settings/
 /*/build
+/.idea
 
 carController/commands
 carController/src/test/DifferentialPilotTest.java
