@@ -6,7 +6,6 @@ import org.tzi.use.api.UseSystemApi;
 import org.tzi.use.runtime.gui.IPluginAction;
 import org.tzi.use.runtime.gui.IPluginActionDelegate;
 import pubsub.DTPubSub;
-import pubsub.InPubService;
 import pubsub.OutPubService;
 import pubsub.SubService;
 import redis.clients.jedis.Jedis;
@@ -29,7 +28,7 @@ public class DigitalTwinConnectorPlugin implements IPluginActionDelegate {
     private boolean shutDown;
     private OutPubService outPublisher;
     private OutPubService commandOutPublisher;
-    private InPubService inPublisher;
+    //private InPubService inPublisher;
 
     /**
      * Default constructor
@@ -51,11 +50,9 @@ public class DigitalTwinConnectorPlugin implements IPluginActionDelegate {
             jedisPool = new JedisPool(new JedisPoolConfig(), "localhost");
 
             checkConnectionWithDatabase();
-            this.outPublisher = new OutPubService(DTPubSub.DT_OUT_CHANNEL, api, jedisPool, 5000,
-                    new OutputSnapshotsManager());
-            this.commandOutPublisher = new OutPubService(DTPubSub.COMMAND_OUT_CHANNEL, api, jedisPool, 5000,
-                    new CommandsManager());
-            this.inPublisher = new InPubService(DTPubSub.DT_IN_CHANNEL, jedisPool, 5000);
+            this.outPublisher = new OutPubService(DTPubSub.DT_OUT_CHANNEL, api, jedisPool, 5000, new OutputSnapshotsManager());
+            this.commandOutPublisher = new OutPubService(DTPubSub.COMMAND_OUT_CHANNEL, api, jedisPool, 5000, new CommandsManager());
+            //this.inPublisher = new InPubService(DTPubSub.DT_IN_CHANNEL, jedisPool, 5000);
 
             if (executor.isShutdown()) {
                 executor = Executors.newFixedThreadPool(3);
@@ -63,19 +60,16 @@ public class DigitalTwinConnectorPlugin implements IPluginActionDelegate {
 
             executor.submit(outPublisher);
             executor.submit(commandOutPublisher);
-            executor.submit(inPublisher);
+            //executor.submit(inPublisher);
 
-            new Thread(new SubService(api, jedisPool, DTPubSub.DT_OUT_CHANNEL),
-                    "subscriber " + DTPubSub.DT_OUT_CHANNEL + " thread").start();
-            new Thread(new SubService(api, jedisPool, DTPubSub.COMMAND_OUT_CHANNEL),
-                    "subscriber " + DTPubSub.COMMAND_OUT_CHANNEL + " thread").start();
-            new Thread(new SubService(api, jedisPool, DTPubSub.DT_IN_CHANNEL),
-                    "subscriber " + DTPubSub.DT_IN_CHANNEL + " thread").start();
+            new Thread(new SubService(api, jedisPool, DTPubSub.DT_OUT_CHANNEL), "subscriber " + DTPubSub.DT_OUT_CHANNEL + " thread").start();
+            new Thread(new SubService(api, jedisPool, DTPubSub.COMMAND_OUT_CHANNEL), "subscriber " + DTPubSub.COMMAND_OUT_CHANNEL + " thread").start();
+            //new Thread(new SubService(api, jedisPool, DTPubSub.DT_IN_CHANNEL), "subscriber " + DTPubSub.DT_IN_CHANNEL + " thread").start();
             shutDown = false;
         } else {
             outPublisher.stop();
             commandOutPublisher.stop();
-            inPublisher.stop();
+            //inPublisher.stop();
             shutDown = true;
             System.out.println("[INFO-DT] Connection ended successfully");
         }
