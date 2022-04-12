@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
   <component name="EclipseModuleManager">
-    <libelement value="jar://$MODULE_DIR$/lib/commons-pool2-2.9.0.jar!/" />
-    <libelement value="jar://$MODULE_DIR$/lib/jedis-3.6.0.jar!/" />
-    <libelement value="jar://$MODULE_DIR$/lib/slf4j-api-1.7.30.jar!/" />
-    <libelement value="jar://$MODULE_DIR$/lib/json-simple-1.1.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../carConnector/lib/commons-pool2-2.9.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../carConnector/lib/jedis-3.6.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../carConnector/lib/slf4j-api-1.7.30.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../carConnector/lib/json-simple-1.1.1.jar!/" />
     <src_description expected_position="0">
-      <src_folder value="file://$MODULE_DIR$/src" expected_position="0" />
+      <src_folder value="file://$MODULE_DIR$/../carConnector/src" expected_position="0" />
     </src_description>
   </component>
   <component name="NewModuleRootManager">
@@ -18,7 +18,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="module-library" exported="">
-      <library name="commons-pool2-2.9.0.jar">
+      <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/commons-pool2-2.9.0.jar!/" />
         </CLASSES>
@@ -27,7 +27,7 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library" exported="">
-      <library name="jedis-3.6.0.jar">
+      <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/jedis-3.6.0.jar!/" />
         </CLASSES>
@@ -36,7 +36,16 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library" exported="">
-      <library name="slf4j-api-1.7.30.jar">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/json-simple-1.1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/slf4j-api-1.7.30.jar!/" />
         </CLASSES>
@@ -45,9 +54,9 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library" exported="">
-      <library name="json-simple-1.1.1.jar">
+      <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/json-simple-1.1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/snakeyaml-1.30.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

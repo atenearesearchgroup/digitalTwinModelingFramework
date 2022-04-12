@@ -1,0 +1,21 @@
+outputClass: OutputCarSnapshot
+outputAttributes:
+  twinId : str
+  timestamp : double
+  executionId : double
+  xPos : double
+  yPos : double
+  angle : double
+  speed : double
+  light : double
+  distance : double
+  bump : boolean
+  isMoving : boolean
+  action : str
+inputClass: InputCarSnapshot
+commandAttributes:
+  twinId : str
+  timestamp: double
+  executionId: double
+  action: str
+

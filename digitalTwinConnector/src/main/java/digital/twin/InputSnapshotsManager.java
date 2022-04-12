@@ -34,7 +34,6 @@ public class InputSnapshotsManager {
      *
      * @param api   USE system API instance to interact with the currently displayed object diagram.
      * @param jedis An instance of the Jedis client to access the data lake.
-     * @throws UseApiException
      */
     public static void saveSnapshots(UseSystemApi api, Jedis jedis, ConfigurationManager cm) throws UseApiException {
         Set<String> unprocessedSnapshots = InputSnapshotsManager.getUnprocessedSnapshots(jedis);

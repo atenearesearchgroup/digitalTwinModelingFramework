@@ -1,5 +1,6 @@
 package receiver;
 
+import config.ConfigurationManager;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import redis.clients.jedis.Jedis;
@@ -13,16 +14,12 @@ import java.util.Map;
 /**
  * @author Paula Mu&ntilde;oz - University of M&atilde;laga
  * Receives the sensor information sent by the car and stores it in the database.
- * <p>
- * TODO: Support a configuration file that determines the format of the information to be received, specifying which attributes we want to receive and store.
  */
 public class SensorReceiver implements Runnable {
 
     private final String PROCESSING_QUEUE = "PROCESSING_QUEUE_LIST";
     private final String PHYSICAL_TWIN = "physical_twin";
     private final String SNAPSHOT_ID = "snapshotId";
-    private final String EXECUTION_ID = "executionId";
-    private final String STRING = "str";
     private final String NUMBER = "double";
 
     private final Map<String, String> attributes;
@@ -35,30 +32,16 @@ public class SensorReceiver implements Runnable {
      *
      * @param jedisPool    Jedis client pool, connected to the Data Lake
      * @param inFromClient connection to serverSocket
-     * TODO: Add configuration file to set the type of the attributes
      */
     public SensorReceiver(JedisPool jedisPool, BufferedReader inFromClient) throws IOException {
         this.jedisPool = jedisPool;
         this.inFromClient = inFromClient;
 
         this.attributes = new HashMap<>();
-
-        attributes.put("twinId", STRING);
-        attributes.put("timestamp", NUMBER);
-        attributes.put(EXECUTION_ID, NUMBER);
-        attributes.put(SNAPSHOT_ID, STRING);
-
-        attributes.put("xPos", NUMBER);
-        attributes.put("yPos", NUMBER);
-        attributes.put("angle", NUMBER);
-        attributes.put("speed", NUMBER);
-
-        attributes.put("light", NUMBER);
-        attributes.put("distance", NUMBER);
-        attributes.put("bump", NUMBER);
-        attributes.put("isMoving", NUMBER);
-
-        attributes.put("action", STRING);
+        Map<String, String> attr = ConfigurationManager.getConfig().getOutputAttributes();
+        for(String attrName : attr.keySet()){
+            attributes.put(attrName, attr.get(attrName));
+        }
     }
 
     /**

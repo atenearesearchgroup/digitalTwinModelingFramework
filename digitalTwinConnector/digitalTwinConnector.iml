@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
   <component name="EclipseModuleManager">
-    <libelement value="jar://$MODULE_DIR$/lib/use.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/../useConnector/lib/use.jar!/" />
     <src_description expected_position="0">
-      <src_folder value="file://$MODULE_DIR$/src/main/java" expected_position="0" />
-      <src_folder value="file://$MODULE_DIR$/src/main/resources" expected_position="1" />
-      <src_folder value="file://$MODULE_DIR$/src/test/java" expected_position="2" />
-      <src_folder value="file://$MODULE_DIR$/src/test/resources" expected_position="3" />
+      <src_folder value="file://$MODULE_DIR$/../useConnector/src/main/java" expected_position="0" />
+      <src_folder value="file://$MODULE_DIR$/../useConnector/src/main/resources" expected_position="1" />
+      <src_folder value="file://$MODULE_DIR$/../useConnector/src/test/java" expected_position="2" />
+      <src_folder value="file://$MODULE_DIR$/../useConnector/src/test/resources" expected_position="3" />
     </src_description>
   </component>
   <component name="NewModuleRootManager">
@@ -20,16 +20,7 @@
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="inheritedJdk" />
-    <orderEntry type="module-library" exported="">
-      <library name="use.jar">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/use.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module" module-name="carConnector" exported="" />
+    <orderEntry type="module" module-name="physicalTwinConnector" exported="" />
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
@@ -51,7 +42,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/slf4j-api-1.7.25.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/slf4j-api-1.7.30.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -60,7 +51,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/slf4j-simple-1.7.25.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/snakeyaml-1.30.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -78,7 +69,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/snakeyaml-1.30.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/use.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
