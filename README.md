@@ -16,11 +16,11 @@ This module is in charge of the car's movement. It retrieves the sensors' data a
 
 The car used in our development is a Lego Mindstorms NXT, and we used the firmware [LeJOS](https://web.archive.org/web/20210507030446/http://lejos.org/) to define its behavior.
 
-### [carConnector](https://github.com/atenearesearchgroup/digitalTwinModelingFramework/tree/main/carConnector)
+### [physicalTwinConnector](https://github.com/atenearesearchgroup/digitalTwinModelingFramework/tree/main/carConnector)
 
 This module takes the raw data from the carController and stores it in the data lake.
 
-### [useConnector](https://github.com/atenearesearchgroup/digitalTwinModelingFramework/tree/main/useConnector)
+### [digitalTwinConnector](https://github.com/atenearesearchgroup/digitalTwinModelingFramework/tree/main/useConnector)
 
 This module is a USE plugin in charge of the bidirectional connections to the data lake. This module takes the necessary information from the models in USE and stores it in the data lake and vice versa.
 
