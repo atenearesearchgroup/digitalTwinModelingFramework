@@ -81,4 +81,9 @@
     </target>
 	
     <target name="release" depends="release-jar,release-sources" description="Creates full release." />
+
+	<target name="deployDebug" depends="jar">
+		<copy file="dist/${filename}" todir="${use.path}/lib/plugins"/>
+		<copy file="config/DTConfig.yaml" todir="${use.path}/lib/plugins"/>
+	</target>
 </project>

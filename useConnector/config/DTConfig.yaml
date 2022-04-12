@@ -1,0 +1,14 @@
+retrievedClass: OutputCarSnapshot
+attributes:
+  twinId : str
+  timestamp : double
+  executionId : double
+  xPos : double
+  yPos : double
+  angle : double
+  speed : double
+  light : double
+  distance : double
+  bump : boolean
+  isMoving : boolean
+  action : str
