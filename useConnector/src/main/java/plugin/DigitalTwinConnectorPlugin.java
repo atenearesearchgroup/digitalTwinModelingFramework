@@ -1,5 +1,6 @@
 package plugin;
 
+import config.ConfigurationManager;
 import digital.twin.CommandsManager;
 import digital.twin.OutputSnapshotsManager;
 import org.tzi.use.api.UseSystemApi;
@@ -50,8 +51,8 @@ public class DigitalTwinConnectorPlugin implements IPluginActionDelegate {
             jedisPool = new JedisPool(new JedisPoolConfig(), "localhost");
 
             checkConnectionWithDatabase();
-            this.outPublisher = new OutPubService(DTPubSub.DT_OUT_CHANNEL, api, jedisPool, 5000, new OutputSnapshotsManager());
-            this.commandOutPublisher = new OutPubService(DTPubSub.COMMAND_OUT_CHANNEL, api, jedisPool, 5000, new CommandsManager());
+            this.outPublisher = new OutPubService(DTPubSub.DT_OUT_CHANNEL, api, jedisPool, 5000, new OutputSnapshotsManager(ConfigurationManager.getConfig()));
+            this.commandOutPublisher = new OutPubService(DTPubSub.COMMAND_OUT_CHANNEL, api, jedisPool, 5000, new CommandsManager(ConfigurationManager.getConfig()));
             //this.inPublisher = new InPubService(DTPubSub.DT_IN_CHANNEL, jedisPool, 5000);
 
             if (executor.isShutdown()) {

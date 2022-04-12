@@ -1,5 +1,6 @@
 package digital.twin;
 
+import config.ConfigurationManager;
 import org.tzi.use.api.UseApiException;
 import org.tzi.use.api.UseSystemApi;
 import org.tzi.use.uml.mm.MAttribute;
@@ -17,16 +18,11 @@ import java.util.Map;
 
 public class CommandsManager extends OutputManager {
 
-    public CommandsManager() {
+    public CommandsManager(ConfigurationManager cm) {
         this.retrievedClass = "Command";
         this.setChannel("CommandOutChannel");
         this.identifier = "commands";
-
-        attributes.put("twinId", STRING);
-        attributes.put("timestamp", NUMBER);
-        attributes.put("executionId", NUMBER);
-
-        attributes.put("action", STRING);
+        this.attributes = cm.getCommandsAttributes();
     }
 
     /**

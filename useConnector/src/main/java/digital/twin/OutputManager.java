@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class OutputManager {
-    protected final Map<String, String> attributes;
+    protected Map<String, String> attributes;
     protected final String SNAPSHOT_ID = "snapshotId";
     protected final String STRING = "str";
     protected final String NUMBER = "double";

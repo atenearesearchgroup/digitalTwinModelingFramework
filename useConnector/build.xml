@@ -20,6 +20,7 @@
 	<property name="useplugin.file" value="useplugin.xml" />
 	<property name="plugin.lib" value="lib" />
 	<property name="filename" value="DigitalTwinConnector.jar" />
+	<property name="use.path" value="C:\Users\paula\Desktop\USE-Uncertainty-discount"/>
 
 	<path id="classpath">
 		<fileset dir="${plugin.lib}" includes="*.jar" />
@@ -50,8 +51,8 @@
 			<fileset dir="." includes="useplugin.xml" />
 			<zipfileset src="lib/commons-pool2-2.9.0.jar" />
 			<zipfileset src="lib/jedis-3.6.0.jar" />
-			<zipfileset src="lib/slf4j-api-1.7.25.jar" />
-			<zipfileset src="lib/slf4j-simple-1.7.25.jar" />
+			<zipfileset src="lib/slf4j-api-1.7.30.jar" />
+			<zipfileset src="lib/snakeyaml-1.30.jar"/>
 		</jar>
 	</target>
 

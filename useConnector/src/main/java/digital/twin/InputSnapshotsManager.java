@@ -1,5 +1,6 @@
 package digital.twin;
 
+import config.ConfigurationManager;
 import org.tzi.use.api.UseApiException;
 import org.tzi.use.api.UseSystemApi;
 import org.tzi.use.uml.mm.MAttribute;
@@ -24,8 +25,7 @@ public class InputSnapshotsManager {
      * @return Returns the list of unprocessed snapshots stored in the Data Lake
      */
     public static Set<String> getUnprocessedSnapshots(Jedis jedis) {
-        Set<String> snapshots = jedis.zrangeByLex(PROCESSING_QUEUE_LIST, "[0", "(1");
-        return snapshots;
+        return jedis.zrangeByLex(PROCESSING_QUEUE_LIST, "[0", "(1");
     }
 
     /**
@@ -36,19 +36,19 @@ public class InputSnapshotsManager {
      * @param jedis An instance of the Jedis client to access the data lake.
      * @throws UseApiException
      */
-    public static void saveSnapshots(UseSystemApi api, Jedis jedis) throws UseApiException {
+    public static void saveSnapshots(UseSystemApi api, Jedis jedis, ConfigurationManager cm) throws UseApiException {
         Set<String> unprocessedSnapshots = InputSnapshotsManager.getUnprocessedSnapshots(jedis);
         for (String snapshot : unprocessedSnapshots) {
             String snapshotId = snapshot.substring(2);
             Map<String, String> values = jedis.hgetAll(snapshotId);
 
             String snapshotName = "in" + snapshotId.split(":")[0] + snapshotId.split(":")[2];
-            api.createObject("InputCarSnapshot", snapshotName);
+            api.createObject(cm.getInputClass(), snapshotName);
             System.out.println("[Snapshot] " + snapshotName);
 
             for (String value : values.keySet()) {
                 //System.out.println("[Snapshot] " + value + " : " + values.get(value));
-                MAttribute attribute = api.getSystem().model().getClass("InputCarSnapshot").attribute(value, true);
+                MAttribute attribute = api.getSystem().model().getClass(cm.getInputClass()).attribute(value, true);
                 if (attribute != null) {
                     Type type = attribute.type();
                     //System.out.println("[Snapshot] " + type);

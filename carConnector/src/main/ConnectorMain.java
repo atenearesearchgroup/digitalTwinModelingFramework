@@ -1,7 +1,7 @@
 package main;
 
 import communication.CommandsReporter;
-import communication.SensorReceiver;
+import receiver.SensorReceiver;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 

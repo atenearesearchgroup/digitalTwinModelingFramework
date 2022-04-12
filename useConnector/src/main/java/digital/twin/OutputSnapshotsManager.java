@@ -1,16 +1,13 @@
 package digital.twin;
 
+import config.ConfigurationManager;
 import org.tzi.use.api.UseApiException;
 import org.tzi.use.api.UseSystemApi;
 import org.tzi.use.uml.mm.MAttribute;
 import org.tzi.use.uml.ocl.value.Value;
 import org.tzi.use.uml.sys.MObjectState;
-import org.yaml.snakeyaml.Yaml;
 import redis.clients.jedis.Jedis;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,27 +17,16 @@ import java.util.Map;
  */
 public class OutputSnapshotsManager extends OutputManager {
 
-    final String CONFIGURATION_FILE_PATH = "./DTConfig.yaml";
-    final String RETRIEVED_CLASS = "retrievedClass";
-    final String ATTRIBUTES = "attributes";
-
     /**
      * It sets the type of the attributes in a HashMap to parse the attributes for the Data Lake.
      * For example, Booleans will turn into 0 or 1; Numbers will be transformed into Floats.
      */
-    @SuppressWarnings("unchecked")
-    public OutputSnapshotsManager() {
+    public OutputSnapshotsManager(ConfigurationManager cm) {
         super();
         this.setChannel("DTOutChannel");
-        Map<String, Object> configurationParameters = loadConfigurationFile();
-
-        this.retrievedClass = configurationParameters.get(RETRIEVED_CLASS).toString();
+        this.retrievedClass = cm.getOutputClass();
         this.identifier = "processedSnapsDT";
-
-        Map<String, Object> attsConfiguration = (Map<String, Object>) configurationParameters.get(ATTRIBUTES);
-        for(String attName : attsConfiguration.keySet()){
-            attributes.put(attName, attsConfiguration.get(attName).toString());
-        }
+        this.attributes = cm.getOutputAttributes();
     }
 
     /**
@@ -61,14 +47,5 @@ public class OutputSnapshotsManager extends OutputManager {
         }
     }
 
-    private Map<String, Object> loadConfigurationFile() {
-        InputStream inputStream = null;
-        Yaml yaml = new Yaml();
-        try {
-            inputStream = new FileInputStream(CONFIGURATION_FILE_PATH);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return yaml.load(inputStream);
-    }
+
 }

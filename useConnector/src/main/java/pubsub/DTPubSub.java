@@ -1,5 +1,6 @@
 package pubsub;
 
+import config.ConfigurationManager;
 import digital.twin.CommandsManager;
 import digital.twin.InputSnapshotsManager;
 import digital.twin.OutputSnapshotsManager;
@@ -7,6 +8,8 @@ import org.tzi.use.api.UseApiException;
 import org.tzi.use.api.UseSystemApi;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
+
+import java.util.logging.Logger;
 
 /**
  * @author Paula Mu&ntilde;oz - University of M&atilde;laga
@@ -24,18 +27,18 @@ public class DTPubSub extends JedisPubSub {
     /**
      * Default constructor
      *
-     * @param api   USE system API instance to interact with the currently displayed object diagram.
+     * @param api   USE system API instances to interact with the currently displayed object diagram.
      * @param jedis An instance of the Jedis client to access the data lake.
      */
     public DTPubSub(UseSystemApi api, Jedis jedis) {
         this.api = api;
         this.jedis = jedis;
-        this.dTOutSnapshotsManager = new OutputSnapshotsManager();
-        this.commandsManager = new CommandsManager();
+        this.dTOutSnapshotsManager = new OutputSnapshotsManager(ConfigurationManager.getConfig());
+        this.commandsManager = new CommandsManager(ConfigurationManager.getConfig());
     }
 
     /**
-     * This method is called every time a message is received through an specific channel
+     * This method is called every time a message is received through a specific channel
      *
      * @param channel Channel from which the message was received
      * @param message Message received
@@ -45,7 +48,7 @@ public class DTPubSub extends JedisPubSub {
         switch (channel) {
             case DT_IN_CHANNEL: // Info entering USE
                 try {
-                    InputSnapshotsManager.saveSnapshots(api, jedis);
+                    InputSnapshotsManager.saveSnapshots(api, jedis, ConfigurationManager.getConfig());
                     System.out.println("[INFO-DT] New Input Snapshots saved");
                 } catch (UseApiException e1) {
                     e1.printStackTrace();

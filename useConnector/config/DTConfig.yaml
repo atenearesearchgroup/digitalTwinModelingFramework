@@ -1,5 +1,5 @@
-retrievedClass: OutputCarSnapshot
-attributes:
+outputClass: OutputCarSnapshot
+outputAttributes:
   twinId : str
   timestamp : double
   executionId : double
@@ -12,3 +12,10 @@ attributes:
   bump : boolean
   isMoving : boolean
   action : str
+inputClass: InputCarSnapshot
+commandAttributes:
+  twinId : str
+  timestamp: double
+  executionId: double
+  action: str
+
