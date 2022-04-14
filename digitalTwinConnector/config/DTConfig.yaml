@@ -13,9 +13,14 @@ outputAttributes:
   isMoving : boolean
   action : str
 inputClass: InputCarSnapshot
+outCommandClass: OutCommand
+inCommandClass: Command
 commandAttributes:
   twinId : str
   timestamp: double
-  executionId: double
+  args: str
   action: str
+  processedDT: boolean
+  processedPT: boolean
+
 

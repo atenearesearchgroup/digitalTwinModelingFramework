@@ -1,6 +1,0 @@
-reset
-!new Clock('clock');
-!new Monitor('monitor1');
-!insert(clock, monitor1) into Timing;
-!new AnalysisConfiguration('analysis');
-

@@ -85,19 +85,19 @@ public abstract class OutputManager {
      * @param api                USE system API instance to interact with the currently displayed object diagram.
      * @param jedis              An instance of the Jedis client to access the data lake.
      * @param snapshot           An instance of the Snapshot Object retrieved from USE
-     * @param carValues          List with the attributes retrieved from the Snapshot
+     * @param dtValues          List with the attributes retrieved from the Snapshot
      * @param snapshotAttributes List with the name of the attributes in the snapshot class
      * @param snapshotId         Snapshot identifier
      * @throws UseApiException Any error related to the USE API
      */
-    protected void saveAttributes(UseSystemApi api, Jedis jedis, MObjectState snapshot, Map<String, String> carValues, Map<MAttribute, Value> snapshotAttributes, String snapshotId) throws UseApiException {
-        carValues.put(SNAPSHOT_ID, snapshotId);
+    protected void saveAttributes(UseSystemApi api, Jedis jedis, MObjectState snapshot, Map<String, String> dtValues, Map<MAttribute, Value> snapshotAttributes, String snapshotId) throws UseApiException {
+        dtValues.put(SNAPSHOT_ID, snapshotId);
         String executionId = snapshotId.substring(0, snapshotId.lastIndexOf(":"));
 
         for (String att : this.attributes.keySet()) {
             String attributeValue = getAttribute(snapshotAttributes, att);
             System.out.println("[INFO-DT-Output] " + att + ": " + attributeValue);
-            carValues.put(att, attributeValue);
+            dtValues.put(att, attributeValue);
             if (attributes.get(att).equals(NUMBER)) {
                 addSearchRegister(att, Double.parseDouble(attributeValue.replace("'", "")), snapshotId, jedis, executionId);
             } else if (attributes.get(att).equals(BOOLEAN)) {
@@ -105,7 +105,7 @@ public abstract class OutputManager {
             }
         }
 
-        jedis.hset(snapshotId, carValues);
+        jedis.hset(snapshotId, dtValues);
         jedis.zadd(identifier, 0, snapshotId);
 
         api.deleteObjectEx(snapshot.object());

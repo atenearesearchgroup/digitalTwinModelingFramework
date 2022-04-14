@@ -1,15 +1,14 @@
 package pubsub;
 
 import config.ConfigurationManager;
-import digital.twin.CommandsManager;
+import digital.twin.InputCommandsManager;
+import digital.twin.OutputCommandsManager;
 import digital.twin.InputSnapshotsManager;
 import digital.twin.OutputSnapshotsManager;
 import org.tzi.use.api.UseApiException;
 import org.tzi.use.api.UseSystemApi;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
-
-import java.util.logging.Logger;
 
 /**
  * @author Paula Mu&ntilde;oz - University of M&atilde;laga
@@ -19,10 +18,14 @@ public class DTPubSub extends JedisPubSub {
     public static final String DT_OUT_CHANNEL = "DTOutChannel";
     public static final String DT_IN_CHANNEL = "DTInChannel";
     public static final String COMMAND_OUT_CHANNEL = "CommandOutChannel";
+    public static final String COMMAND_IN_CHANNEL = "CommandInChannel";
     private final UseSystemApi api;
     private final Jedis jedis;
     private final OutputSnapshotsManager dTOutSnapshotsManager;
-    private final CommandsManager commandsManager;
+    private final OutputCommandsManager outCommandsManager;
+    private final InputSnapshotsManager dtInputSnapshotsManager;
+    private final InputCommandsManager inputCommandsManager;
+
 
     /**
      * Default constructor
@@ -34,7 +37,9 @@ public class DTPubSub extends JedisPubSub {
         this.api = api;
         this.jedis = jedis;
         this.dTOutSnapshotsManager = new OutputSnapshotsManager(ConfigurationManager.getConfig());
-        this.commandsManager = new CommandsManager(ConfigurationManager.getConfig());
+        this.outCommandsManager = new OutputCommandsManager(ConfigurationManager.getConfig());
+        this.dtInputSnapshotsManager = new InputSnapshotsManager();
+        this.inputCommandsManager = new InputCommandsManager();
     }
 
     /**
@@ -48,7 +53,7 @@ public class DTPubSub extends JedisPubSub {
         switch (channel) {
             case DT_IN_CHANNEL: // Info entering USE
                 try {
-                    InputSnapshotsManager.saveSnapshots(api, jedis, ConfigurationManager.getConfig());
+                    this.dtInputSnapshotsManager.saveObjects(api, jedis, ConfigurationManager.getConfig());
                     System.out.println("[INFO-DT] New Input Snapshots saved");
                 } catch (UseApiException e1) {
                     e1.printStackTrace();
@@ -64,8 +69,16 @@ public class DTPubSub extends JedisPubSub {
                 break;
             case COMMAND_OUT_CHANNEL:
                 try {
-                    this.commandsManager.saveObjects(api, jedis);
-                    System.out.println("[INFO-DT] New Commands saved");
+                    this.outCommandsManager.saveObjects(api, jedis);
+                    System.out.println("[INFO-DT] New Output Commands saved to database");
+                } catch (UseApiException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case COMMAND_IN_CHANNEL:
+                try {
+                    this.inputCommandsManager.saveObjects(api, jedis, ConfigurationManager.getConfig());
+                    System.out.println("[INFO-DT] New Input Commands sent to the Digital Twin");
                 } catch (UseApiException e) {
                     e.printStackTrace();
                 }

@@ -46,18 +46,21 @@ public class OutPubService extends PubService {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            
+			System.out.println("holiwi" + this.getChannel());
             // Checks for new snapshots
-            Jedis jedisTemporalConnection = jedisPool.getResource();
+			Jedis jedisTemporalConnection = null;
             try {
             	if(!output.getObjects(api).isEmpty()) {
+					jedisTemporalConnection = jedisPool.getResource();
             		jedisTemporalConnection.publish(this.getChannel(), "New Information");
             		System.out.println("[" + this.hashCode() + "-" + this.getChannel()+ "]" + " New Information");
             	}
             } catch (Exception e) {
                e.printStackTrace();
             } finally {
-               jedisPool.returnResource(jedisTemporalConnection);
+				if (jedisTemporalConnection!= null){
+				   jedisPool.returnResource(jedisTemporalConnection);
+				}
             }
             
         }

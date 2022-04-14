@@ -1,6 +1,5 @@
 package config;
 
-import digital.twin.OutputSnapshotsManager;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -12,29 +11,31 @@ import java.util.Map;
 
 public class ConfigurationManager {
 
+    private static ConfigurationManager config = null;
     private final String outputClass;
     private final String inputClass;
-
+    private final String outCommandClass;
+    private final String inCommandClass;
     private final Map<String, String> outputAttributes;
     private final Map<String, String> commandsAttributes;
 
-    private static ConfigurationManager config = null;
-
     @SuppressWarnings("unchecked")
-    private ConfigurationManager(){
+    private ConfigurationManager() {
         String CONFIGURATION_FILE_PATH = "/DTConfig.yaml";
 
         Map<String, Object> configurationParameters = loadConfigurationFile(getAbsolutePath() + CONFIGURATION_FILE_PATH);
 
         this.outputClass = configurationParameters.get("outputClass").toString();
         this.inputClass = configurationParameters.get("inputClass").toString();
+        this.outCommandClass = configurationParameters.get("outCommandClass").toString();
+        this.inCommandClass = configurationParameters.get("inCommandClass").toString();
 
         this.outputAttributes = getAttributes((Map<String, Object>) configurationParameters.get("outputAttributes"));
         this.commandsAttributes = getAttributes((Map<String, Object>) configurationParameters.get("commandAttributes"));
     }
 
-    public static ConfigurationManager getConfig(){
-        if(config == null){
+    public static ConfigurationManager getConfig() {
+        if (config == null) {
             config = new ConfigurationManager();
         }
         return config;
@@ -51,7 +52,7 @@ public class ConfigurationManager {
         return yaml.load(inputStream);
     }
 
-    private Map<String, String> getAttributes(Map<String, Object> attsConfiguration){
+    private Map<String, String> getAttributes(Map<String, Object> attsConfiguration) {
         Map<String, String> result = new HashMap<>();
         for (String attName : attsConfiguration.keySet()) {
             result.put(attName, attsConfiguration.get(attName).toString());
@@ -59,7 +60,7 @@ public class ConfigurationManager {
         return result;
     }
 
-    private String getAbsolutePath(){
+    private String getAbsolutePath() {
         File jarPath = new File(ConfigurationManager.class.getProtectionDomain().getCodeSource().getLocation().getPath());
         return jarPath.getParentFile().getAbsolutePath();
     }
@@ -70,6 +71,14 @@ public class ConfigurationManager {
 
     public String getInputClass() {
         return inputClass;
+    }
+
+    public String getOutCommandClass() {
+        return outCommandClass;
+    }
+
+    public String getInCommandClass() {
+        return inCommandClass;
     }
 
     public Map<String, String> getOutputAttributes() {

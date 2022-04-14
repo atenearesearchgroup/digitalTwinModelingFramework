@@ -1,12 +1,15 @@
 package plugin;
 
 import config.ConfigurationManager;
-import digital.twin.CommandsManager;
+import digital.twin.InputCommandsManager;
+import digital.twin.InputSnapshotsManager;
+import digital.twin.OutputCommandsManager;
 import digital.twin.OutputSnapshotsManager;
 import org.tzi.use.api.UseSystemApi;
 import org.tzi.use.runtime.gui.IPluginAction;
 import org.tzi.use.runtime.gui.IPluginActionDelegate;
 import pubsub.DTPubSub;
+import pubsub.InPubService;
 import pubsub.OutPubService;
 import pubsub.SubService;
 import redis.clients.jedis.Jedis;
@@ -29,7 +32,8 @@ public class DigitalTwinConnectorPlugin implements IPluginActionDelegate {
     private boolean shutDown;
     private OutPubService outPublisher;
     private OutPubService commandOutPublisher;
-    //private InPubService inPublisher;
+    private InPubService inPublisher;
+    private InPubService commandInPublisher;
 
     /**
      * Default constructor
@@ -52,25 +56,29 @@ public class DigitalTwinConnectorPlugin implements IPluginActionDelegate {
 
             checkConnectionWithDatabase();
             this.outPublisher = new OutPubService(DTPubSub.DT_OUT_CHANNEL, api, jedisPool, 5000, new OutputSnapshotsManager(ConfigurationManager.getConfig()));
-            this.commandOutPublisher = new OutPubService(DTPubSub.COMMAND_OUT_CHANNEL, api, jedisPool, 5000, new CommandsManager(ConfigurationManager.getConfig()));
-            //this.inPublisher = new InPubService(DTPubSub.DT_IN_CHANNEL, jedisPool, 5000);
+            this.commandOutPublisher = new OutPubService(DTPubSub.COMMAND_OUT_CHANNEL, api, jedisPool, 5000, new OutputCommandsManager(ConfigurationManager.getConfig()));
+            this.inPublisher = new InPubService(DTPubSub.DT_IN_CHANNEL, jedisPool, 5000, new InputSnapshotsManager());
+            this.commandInPublisher = new InPubService(DTPubSub.COMMAND_IN_CHANNEL, jedisPool, 5000, new InputCommandsManager());
 
             if (executor.isShutdown()) {
-                executor = Executors.newFixedThreadPool(3);
+                executor = Executors.newFixedThreadPool(4);
             }
 
             executor.submit(outPublisher);
             executor.submit(commandOutPublisher);
-            //executor.submit(inPublisher);
+            executor.submit(inPublisher);
+            executor.submit(commandInPublisher);
 
             new Thread(new SubService(api, jedisPool, DTPubSub.DT_OUT_CHANNEL), "subscriber " + DTPubSub.DT_OUT_CHANNEL + " thread").start();
             new Thread(new SubService(api, jedisPool, DTPubSub.COMMAND_OUT_CHANNEL), "subscriber " + DTPubSub.COMMAND_OUT_CHANNEL + " thread").start();
-            //new Thread(new SubService(api, jedisPool, DTPubSub.DT_IN_CHANNEL), "subscriber " + DTPubSub.DT_IN_CHANNEL + " thread").start();
+            new Thread(new SubService(api, jedisPool, DTPubSub.DT_IN_CHANNEL), "subscriber " + DTPubSub.DT_IN_CHANNEL + " thread").start();
+            new Thread(new SubService(api, jedisPool, DTPubSub.COMMAND_IN_CHANNEL), "subscriber " + DTPubSub.COMMAND_IN_CHANNEL + " thread").start();
             shutDown = false;
         } else {
             outPublisher.stop();
             commandOutPublisher.stop();
-            //inPublisher.stop();
+            inPublisher.stop();
+            commandInPublisher.stop();
             shutDown = true;
             System.out.println("[INFO-DT] Connection ended successfully");
         }
@@ -83,13 +91,11 @@ public class DigitalTwinConnectorPlugin implements IPluginActionDelegate {
     private void checkConnectionWithDatabase() {
         try {
             Jedis jedis = jedisPool.getResource();
-            // prints out "Connection Successful" if Java successfully connects to Redis
-            // server.
             System.out.println("[INFO-DT] Connection Successful");
             System.out.println("[INFO-DT] The server is running " + jedis.ping());
             jedisPool.returnResource(jedis);
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 

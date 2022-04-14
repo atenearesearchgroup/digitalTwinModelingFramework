@@ -1,7 +1,0 @@
-!new Command('c2');
-!c2.twinId := 'NXJCar';
-!c2.action := Action::TurnLeft;
-!c2.initialize();
-
-
-

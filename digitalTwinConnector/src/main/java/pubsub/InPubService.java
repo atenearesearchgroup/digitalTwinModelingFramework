@@ -1,5 +1,6 @@
 package pubsub;
 
+import digital.twin.InputManager;
 import digital.twin.InputSnapshotsManager;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -14,6 +15,7 @@ public class InPubService extends PubService {
 	private final JedisPool jedisPool;
 	private final int sleepTime;
 	private boolean running;
+	private InputManager inputManager;
 	
 	/**
 	 * Default constructor
@@ -21,11 +23,12 @@ public class InPubService extends PubService {
 	 * @param jedisPool		Jedis client pool, connected to the Data Lake
 	 * @param sleepTime		Milliseconds between each check in the database.
 	 */
-	public InPubService(String channel, JedisPool jedisPool, int sleepTime) {
+	public InPubService(String channel, JedisPool jedisPool, int sleepTime, InputManager im) {
 		super(channel);
 		this.jedisPool = jedisPool;
 		this.sleepTime = sleepTime;
 		this.running = true;
+		this.inputManager = im;
 	}
 	
 	/**
@@ -39,19 +42,24 @@ public class InPubService extends PubService {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            
+			System.out.println("holiwi" + this.getChannel());
             // Checks for new snapshots
-            Jedis jedisTempConn = jedisPool.getResource();
+            Jedis jedisTempConn = null;
             Jedis jedisTempConnDL = jedisPool.getResource();
+			System.out.println("holiwiwi" + this.getChannel());
             try {
-            	if(!InputSnapshotsManager.getUnprocessedSnapshots(jedisTempConnDL).isEmpty()) {
+            	if(!this.inputManager.getUnprocessedObjects(jedisTempConnDL).isEmpty()) {
+					jedisTempConn = jedisPool.getResource();
             		jedisTempConn.publish(this.getChannel(), "New Snapshots in database");
             		System.out.println("[" + this.hashCode() + "-DT] " + "New Snapshots in database");
-            	}
+            	} else {
+					System.out.println("esta vacio");
+				}
             } catch (Exception e) {
                e.printStackTrace();
             } finally {
-               jedisPool.returnResource(jedisTempConn);
+				if(jedisTempConn!= null)
+					jedisPool.returnResource(jedisTempConn);
                jedisPool.returnResource(jedisTempConnDL);
             }
             

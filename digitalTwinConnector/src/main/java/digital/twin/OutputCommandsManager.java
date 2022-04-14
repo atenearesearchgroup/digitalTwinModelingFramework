@@ -16,10 +16,10 @@ import java.util.Map;
  * @author Paula Mu&ntilde;oz - University of M&atilde;laga
  */
 
-public class CommandsManager extends OutputManager {
+public class OutputCommandsManager extends OutputManager {
 
-    public CommandsManager(ConfigurationManager cm) {
-        this.retrievedClass = "Command";
+    public OutputCommandsManager(ConfigurationManager cm) {
+        this.retrievedClass = cm.getOutCommandClass();
         this.setChannel("CommandOutChannel");
         this.identifier = "commands";
         this.attributes = cm.getCommandsAttributes();
@@ -37,11 +37,7 @@ public class CommandsManager extends OutputManager {
         for (MObjectState command : unprocessedCommands) {
             Map<String, String> commandsValues = new HashMap<>();
             Map<MAttribute, Value> commandsAttributes = command.attributeValueMap();
-
-            String commandId = "0:0:command:" + getAttribute(commandsAttributes, "twinId").replace("'", "") + ":"
-                    + getAttribute(commandsAttributes, "executionId").replace("'", "") + ":"
-                    + getAttribute(commandsAttributes, "timestamp");
-
+            String commandId = "command:" + getAttribute(commandsAttributes, "twinId").replace("'", "") + ":" + getAttribute(commandsAttributes, "timestamp");
             saveAttributes(api, jedis, command, commandsValues, commandsAttributes, commandId);
         }
     }
