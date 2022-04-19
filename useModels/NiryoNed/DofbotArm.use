@@ -1,0 +1,805 @@
+model NiryoNedArm
+
+-------------------------------------------------------------------------------
+-- SNAPSHOTS MANAGEMENT
+-------------------------------------------------------------------------------
+enum Action {RotateAllServos}
+
+abstract class Snapshot
+    attributes
+        timestamp : Integer
+        executionId : Integer
+    end
+
+abstract class ArmSnapshot < Snapshot
+    attributes
+        twinId : String             init: 'NiryoNedArm'
+        servo1 : Real               init: 0.0
+        servo2 : Real               init: 0.0
+        servo3 : Real               init: 0.0
+        servo4 : Real               init: 0.0
+        servo5 : Real               init: 0.0
+        servo6 : Real               init: 0.0
+        moving : Boolean            init: false
+        processingQueue : Boolean   init: false
+    end
+
+class OutputArmSnapshot < ArmSnapshot
+    operations
+        init(arm : NiryoNedArm, now : Integer)
+            begin
+                declare a : NiryoNedArm;
+                a := arm.oclAsType(NiryoNedArm);
+                self.timestamp := now;
+                self.executionId := a.executionId;
+                self.twinId := a.twinId;
+                self.servo1 := a.angles.s1;
+                self.servo2 := a.angles.s2;
+                self.servo3 := a.angles.s3;
+                self.servo4 := a.angles.s4;
+                self.servo5 := a.angles.s5;
+                self.servo6 := a.angles.s6;
+                self.moving := a.moving;
+            end
+    end
+
+class InputArmSnapshot < ArmSnapshot
+    end
+
+class SnapshotManager < ActiveObject
+    attributes
+        snapshotResolution : Integer init:5
+        lastSnapshot : Integer       init:self.snapshotResolution*(-1)
+    operations
+        action()
+            begin
+                if self.clock.NOW >= (self.lastSnapshot + self.snapshotResolution) then
+                    self.createOutputSnapshot();
+                    self.lastSnapshot := self.clock.NOW;
+                end;
+            end
+
+        createOutputSnapshot()
+            begin
+                declare os : OutputArmSnapshot;
+                for a in NiryoNedArm.allInstances() do
+                    os := new OutputArmSnapshot();
+                    os.init(a, a.servo->at(1).clock.NOW);
+                end;
+            end
+    end    
+
+class Command
+    attributes
+        twinId : String
+        timestamp : Integer
+        action : Action
+        args : Sequence(Real)
+    end
+
+class CommandManager < ActiveObject
+    operations
+        assignCommand()
+            begin
+                declare nextCommand : Command;
+                for a in self.arm do
+                    nextCommand := Command.allInstances()->select(c:Command| c.twinId = a.twinId and
+                        c.timestamp = (Command.allInstances()->select(c:Command|c.twinId = a.twinId)
+                        ->collect(c:Command|c.timestamp)->min()))->any(true);
+                    if not(a.moving) then
+                        if not(a.execCommand.oclIsUndefined()) then
+                            delete(a, a.execCommand) from Execution;
+                            destroy(a.execCommand);
+                        end;
+                        if nextCommand <> null then
+                            a.rotateAllServosArray(nextCommand.args, 0);
+                            insert(a, nextCommand) into Execution;
+                        end;
+                    end;
+                end;
+            end
+
+        action()
+            begin
+                self.assignCommand();
+            end
+    end
+
+
+association CommandManagement between
+    CommandManager [0..1] role cm
+    NiryoNedArm [*] role arm
+end 
+
+association Execution between
+    NiryoNedArm [1] role arm
+    Command [0..1] role execCommand
+end
+
+
+-------------------------------------------------------------------------------
+-- CLOCK
+-------------------------------------------------------------------------------
+class Clock
+    attributes
+        NOW: Integer init:0         -- current time, in POSIX format 
+        resolution: Integer init: 1 -- resolution, in milliseconds
+    operations
+        tick()
+            begin
+                self.NOW:=self.NOW + self.resolution;
+                for o in self.ao do
+                    o.action();
+                end;
+            end
+        run(n:Integer)
+            begin
+                if n>0 then
+                    for i in Sequence{1..n} do
+                        self.tick()
+                    end;
+                end;
+            end
+    end
+
+-------------------------------------------------------------------------------
+-- ACTIVE OBJECT (abstract class)
+-------------------------------------------------------------------------------
+
+abstract class ActiveObject
+    operations
+        action() begin end
+    end
+
+association Time between
+    Clock [1]
+    ActiveObject [*] role ao ordered
+end
+
+-------------------------------------------------------------------------------
+-- CLASS SERVO
+-------------------------------------------------------------------------------
+
+class Servo < ActiveObject
+    attributes
+        id : Integer derive: Sequence{1..6}->any(i|self.arm.servo->at(i)=self)
+        maxSpeed : Real     init: 0.09          -- max speed of the servo. (90 degrees/second = 0.09 deg/millisecond) 
+        currentAngle : Real init: 90.0          -- current angle of the servo (in degrees)
+        currentAngleRad : Real derive: self.currentAngle*self.arm.config.RAD
+        targetAngle : Real                      -- target angle of the servo (in degrees) 
+        targetAngleRad : Real  derive: self.targetAngle*self.arm.config.RAD  	                
+        moving : Boolean    init: false	        -- whether the servos are currently moving or not
+        speed : Real        init: self.maxSpeed	-- current speed of the moving action. degrees/millisecond
+    operations
+
+    -- BASIC MOVEMENTS
+
+    /** rotateTo(angle, time):Integer
+    * Makes the servo rotate to a given angle, in a given duration.
+    * Parameter "angle" indicates the angle. Its value should be between 0 and 270 for servo#5, 
+    * 	or between 0 and 180 for the rest of the servos.
+    * Parameter "time" indicates the number of milliseconds that the rotating action should take. 
+    * 	The smaller the value, the faster the movement. Time=0 indicates the servo to move as fast as possible.
+    * This operation returns the expected duration of the movement. 
+    * NOTE: This function immediately returns control, without waiting for the rotation to complete. 
+    * The user is expected to wait until it finishes (i.e., the number of given milliseconds) before issuing 
+    * any other movement command. Otherwise, the servo will move in an indeterminate manner.
+    *
+    * @param  angle : Real  -- angle to which the servo is rotated, in degrees
+    * @param  time  : Integer  -- running time to complete the rotation action in milliseconds 
+    * @return result : Integer -- expected duration of the movement. 
+    *                          -- result=0 if no need to move (it was already at that angle), otherwise result = time. 
+    *                          -- and if time=0, it computes the duration using attribute self.maxSpeed.
+    */
+        rotateTo(angle : Real, time : Integer) : Integer
+        begin
+            self.targetAngle:=angle;
+            if (self.currentAngle-self.targetAngle).abs()>self.arm.config.ANGULAR_PRECISION then -- Only if we are not there already!
+                self.moving:=true; 
+                self.speed:=if time = 0 then self.maxSpeed 
+                        else ((self.currentAngle-self.targetAngle).abs()/time).max(self.maxSpeed)
+                        endif;
+            else
+                self.moving:=false;
+            end;
+            result:=if self.moving then -- computes the expected duration of the rotation, if moving
+                ((self.currentAngle-self.targetAngle).abs()/self.speed).ceil() 
+                else 0 
+                endif
+        end
+        pre validAngle: angle>=0 and ((self.id=5 and angle<=270) or (self.id<>5 and angle<=180))
+        pre validTime:  time>=0
+        post Moving: (self.currentAngle-self.targetAngle).abs()>self.arm.config.ANGULAR_PRECISION implies self.moving
+        post targetAngleOK: self.targetAngle=angle
+        post Duration: result=if self.moving then ((self.currentAngle-self.targetAngle).abs()/self.speed).ceil() else 0 endif	
+
+    -- ACTION
+
+    /** action()
+    * Moves the servo when this operation is invoked by the clock, and the servo is moving.
+    * The servo advances a number of degrees, depending on the servo speed 
+    * The tick resolution is defined by self.clock.resolution 
+    * The servo stops moving (self.moving:=false) if either:
+    * - the position to which it is going to move is not valid (according to the Arm environment)
+    * - the servo target position is reached  
+    */
+        action()
+        begin
+            declare previousAngle:Real;
+
+            if self.moving then
+                -- checks if the new position is valid
+                previousAngle:=self.currentAngle; -- to be able to rollback if not possible
+                self.currentAngle:=
+                    if self.currentAngle>self.targetAngle then -- decreasing angle
+                        (self.currentAngle-self.speed*self.clock.resolution).max(self.targetAngle)
+                    else 
+                        (self.currentAngle+self.speed*self.clock.resolution).min(self.targetAngle)
+                    endif;
+                if self.arm.config.validPosition(self.arm.angles.s1,self.arm.angles.s2,self.arm.angles.s3,
+                                                self.arm.angles.s4,self.arm.angles.s5,self.arm.angles.s6) then
+                    self.moving:=(self.currentAngle-self.targetAngle).abs()>=self.arm.config.ANGULAR_PRECISION; -- not yet at target angle
+                else 
+                    self.currentAngle:= previousAngle; -- rollback
+                    self.moving:=false; -- stops
+                end
+            end
+        end
+    end
+
+composition Parts between
+    NiryoNedArm [1] role arm
+    Servo [6] role servo ordered
+end
+
+-------------------------------------------------------------------------------
+-- LIGHT
+-------------------------------------------------------------------------------
+
+class Light
+    attributes
+        red:Integer init: 0
+        green:Integer init:0
+        blue:Integer init:0
+    operations
+    /**
+    * Sets the color of RGB light on the board.
+    * Parameter "red" sets the brightness of the red RGB light (0-255). The larger the value, the brighter the brightness
+    * Parameter "green" sets the brightness of the green RGB light (0-255). The larger the value, the brighter the brightness
+    * Parameter "blue" sets the brightness of the blue RGB light (0-255). The larger the value, the brighter the brightness
+    *
+    * @param  red   : Integer  -- red (0~255)
+    * @param  green : Integer  -- green (0~255)
+    * @param  blue  : Integer  -- blue (0~255) 
+    * @return --
+    */
+    set(red : Integer, green : Integer, blue : Integer)
+    begin
+        self.red:=red; self.green:=green; self.blue:=blue;
+    end
+    pre validRed:       red>=0 and red<=255
+    pre validGreen:     green>=0 and green<=255
+    pre validBlue:      blue>=0 and blue<=255
+    post LightOK: self.red=red and self.green=green and self.blue=blue 
+    end
+
+composition Lights between
+    NiryoNedArm [1] role arm
+    Light [1] 
+end
+
+-------------------------------------------------------------------------------
+-- CAMERA
+-------------------------------------------------------------------------------
+
+class Camera < ActiveObject
+    attributes
+        red:Integer init: 0
+        green:Integer init:0
+        blue:Integer init:0
+        on:Boolean init:false
+        delay:Integer -- counter with the time left to read (in milliseconds). 
+        forever:Boolean init:false
+    operations
+
+    /** cameraColor(time:Integer) 
+    * Starts the color recognition process for a given duration (if time=0, it runs forever).
+    * To stop the camera, even if running forever, just call this operation again with time=1 and it stops in 1 millisecond 
+    * @param  time : Integer -- duration, in milliseconds. If time=0, it sets   
+    * @return -- 
+    */
+    cameraColor(time:Integer) 
+        begin
+            self.delay:=time;
+            self.on:=true;
+            self.forever:=(time=0);
+        end
+        pre validTime: time >= 0
+        post RunForever: (time=0) = self.forever 
+
+        action()
+        begin
+            declare c:Tuple(red:Integer,green:Integer,blue:Integer);
+            if self.on then
+                c:=self.arm.config.colorAt(self.arm.position.x,self.arm.position.y,self.arm.position.z); 
+                self.red:=c.red;
+                self.green:=c.green;
+                self.blue:=c.blue;
+                if not self.forever then 
+                    self.delay:=self.delay-self.clock.resolution;
+                    if self.delay<=0 then
+                        self.on:=false;
+                    end;
+                end; 
+
+            end;
+        end
+
+        end
+
+    composition Cameras between
+        NiryoNedArm [1] role arm
+        Camera [1] role camera
+    end
+
+-------------------------------------------------------------------------------
+-- CONFIGURATION OBJECT (To store all configuration parameters)
+-------------------------------------------------------------------------------
+
+class Configuration
+    attributes
+        links : Tuple(l1:Real,l2:Real,l3:Real,l4:Real) derive: Tuple{l1:183,l2:80,l3:240,l4:23.7+180+45} -- lengths of links in millimeters
+        RAD:Real derive: 0.0174532925199 -- constant used to convert degrees to radians -- 6 precision digits
+        ANGULAR_PRECISION:Real derive: 0.01 -- constant used to define the precision of angular movements (in degrees)
+        LINEAR_PRECISION:Real derive: 0.01 -- constant used to define the precision of linear movements and positions (in millimeters)
+    operations
+
+    roundAngle(a:Real) : Real = (a/self.ANGULAR_PRECISION).round()*self.ANGULAR_PRECISION
+
+    roundPosition(x:Real) : Real = (x*10000).round()/10000.0
+
+    toHexString(x:Integer) : String = 
+        let s : Sequence(String) = Sequence{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'} in
+        let n1 : Integer = (x/16).floor().mod(16) in 
+        let n2 : Integer = x.mod(16) in
+        s->at(n1+1) + s->at(n2+1)  
+    pre: 0<=x and x<=255
+
+    -------------------------------------------
+    --AUXILIARY OPERATIONS
+    -------------------------------------------
+    /** angleToPosition
+    * Computes the position (x,y,z) in 3D space of the tip of the gripper (i.e., of the Arm), 
+    * given the four angles of the Arm sensors, and the lengths of the four links
+    * It follows the algorithm described in the paper https://ieeexplore.ieee.org/document/7166008
+    * A.A.Mohammed and M.Sunar. "Kinematics Modelling of a 4-DOF Robotic Arm." Proc. of ICCAR-15, pp. 87-91, IEEE, 2015. 
+    * The result if a Tuple with the three positions (x,y,z) in millimeters
+    *
+    * @param  s1    : Real  -- angle of servo #1, in degrees (0<=s1<=180)
+    * @param  s2    : Real  -- angle of servo #2, in degrees (0<=s2<=180)
+    * @param  s3    : Real  -- angle of servo #3, in degrees (0<=s3<=180)
+    * @param  s4    : Real  -- angle of servo #4, in degrees (0<=s4<=180)
+    * @return result : Tuple(x:Real,y:Real,z:Real) -- positions, in millimeters. 
+    */
+    angleToPosition(s1:Real,s2:Real,s3:Real,s4:Real):Tuple(x:Real,y:Real,z:Real) = 
+        let phi1:Real = (s1 - 90) * self.RAD in
+        let phi2:Real = (s2 - 0)  * self.RAD in  -- the reference position of servo#2 is different in our Dofbot robot from the one in the paper
+        let phi3:Real = (s3 - 90) * self.RAD in
+        let phi4:Real = (s4 - 90) * self.RAD in
+        Tuple{
+            x: self.roundPosition(phi1.cos() * (self.links.l3*(phi2+phi3).cos() + self.links.l2*(phi2).cos() + self.links.l4*(phi2+phi3+phi4).cos())),
+            y: self.roundPosition(phi1.sin() * (self.links.l3*(phi2+phi3).cos() + self.links.l2*(phi2).cos() + self.links.l4*(phi2+phi3+phi4).cos())),
+            z: self.roundPosition(self.links.l1 + self.links.l3*(phi2+phi3).sin() + self.links.l2*(phi2).sin() + self.links.l4*(phi2+phi3+phi4).sin())
+            } -- It should respect that z>=0 because it cannot go below the ground.
+    pre validAngles: (s1>=0 and s1<=180) and 
+                    (s2>=0 and s2<=180) and 
+                    (s3>=0 and s3<=180) and 
+                    (s4>=0 and s4<=180)
+
+
+    -------------------------------------------------------------------------------
+    /** color
+    * Returns the RGB code of the image at position (x,y,z). 
+    * The result if a Tuple with the three positions (x,y,z) in millimeters
+    *
+    * @param  x    : Real  -- x-coordinate, in millimeters
+    * @param  y    : Real  -- y-coordinate, in millimeters
+    * @param  z    : Real  -- z-coordinate, in millimeters
+    * @return result : Tuple(red:Integer,green:Integer,blue:Integer) -- RBG code. 
+    */
+    colorAt(x:Real, y:Real, z:Real) : Tuple(red:Integer,green:Integer,blue:Integer) =
+    if      z <= 100.0 then Tuple{red:255,green:0,blue:0} 
+    else if z >= 400.0 then Tuple{red:0,green:255,blue:0} 
+        else               Tuple{red:0,green:0,blue:255}
+        endif
+    endif 
+
+    -------------------------------------------------------------------------------
+    /** validPosition
+    * Checks if the Arm can be physically located at a given position, given by the values of the angles of its six servos. 
+    *
+    * @param  s1    : Real  -- angle of servo #1, in degrees (0<=s1<=180)
+    * @param  s2    : Real  -- angle of servo #2, in degrees (0<=s2<=180)
+    * @param  s3    : Real  -- angle of servo #3, in degrees (0<=s3<=180)
+    * @param  s4    : Real  -- angle of servo #4, in degrees (0<=s4<=180)
+    * @param  s5    : Real  -- angle of servo #5, in degrees (0<=s4<=270)
+    * @param  s6    : Real  -- angle of servo #6, in degrees (0<=s4<=180)
+    * @return result : Boolean -- if the position is valid in that environment 
+    */
+
+    validPosition(s1:Real,s2:Real,s3:Real,s4:Real,s5:Real,s6:Real):Boolean = 
+        (0<=s1 and s1<=180)  -- no limits in this version
+    and (0<=s2 and s2<=180)  -- no limits in this version
+    and (0<=s3 and s3<=180)  -- no limits in this version
+    and (0<=s4 and s4<=180)  -- no limits in this version
+    and (0<=s5 and s5<=270)  -- no limits in this version
+    and (0<=s6 and s6<=180)  -- no limits in this version
+    -- and let p:Tuple(x:Real,y:Real,z:Real) = self.angleToPosition(s1,s2,s3,s4) in
+    --    true -- so far everything is OK 
+        -- MIN <= p.x and p.x <= MAX, etc. 
+
+    end
+
+composition Config between
+    NiryoNedArm [1] role arm
+    Configuration [1] role config
+end
+
+
+-------------------------------------------------------------------------------
+-- ARM
+-------------------------------------------------------------------------------
+
+class NiryoNedArm
+    attributes
+        twinId : String             init: 'NiryoNedArm'
+        executionId : Integer       init: 1627484055
+        position : Tuple(x:Real,y:Real,z:Real) derive: self.config.angleToPosition( 
+                            self.servo->at(1).currentAngle,self.servo->at(2).currentAngle,
+                            self.servo->at(3).currentAngle,self.servo->at(4).currentAngle)
+        angles : Tuple(s1:Real,s2:Real,s3:Real,s4:Real,s5:Real,s6:Real) derive: 
+            let s:Sequence(Real) = self.readAllServos() in
+            Tuple{s1:s->at(1),s2:s->at(2),s3:s->at(3),s4:s->at(4),s5:s->at(5),s6:s->at(6)}
+        moving : Boolean derive: not self.servo->forAll(s| not s.moving) -- whether any of the servos are currently moving
+        lightRBG : Tuple(red:Integer,green:Integer,blue:Integer) derive: Tuple{red:self.light.red,green:self.light.green,blue:self.light.blue}
+        cameraRBG : Tuple(red:Integer,green:Integer,blue:Integer) derive: if not self.camera.on then Tuple{red:0,green:0,blue:0} 
+                    else Tuple{red:self.camera.red,green:self.camera.green,blue:self.camera.blue} endif
+    operations
+    -------------------------------------------
+    /** rotateServo
+    * Makes a particular servo rotate to a given angle, in a given duration.
+    * Parameter "id" indicates the number of the servo to rotate (1~6). 
+    * 	If id=0, it means all six servos will rotate to that angle.
+    * Parameter "angle" indicates the angle. Its value should be between 0 and 270 for servo#5, 
+    * 	or between 0 and 180 for the rest of the servos.
+    * Parameter "time" indicates the number of milliseconds that the rotating action should take. 
+    * 	The smaller the value, the faster the movement. Time=0 indicates the servo to move as fast as possible.
+    * NOTE: This function immediately returns control, without waiting for the rotation to complete. 
+    * The user is expected to wait until it finishes (i.e., the number of given milliseconds) before issuing 
+    * any other movement command. Otherwise, the servo will move in an indeterminate manner.
+    *
+    * @param  id    : Integer  -- servo id (1~6 or 0)
+    * @param  angle : Real  -- angle to which the servo is rotated, in degrees
+    * @param  time  : Integer  -- running time to complete the rotation action in milliseconds 
+    * @return result : Integer -- expected duration of the movement. 
+    *                          -- result=0 if no need to move (it was already at that angle), otherwise result = time. 
+    *                          -- if time=0, it computes the duration using the attributes self.maxSpeed of the servos.
+    */
+    rotateServo(id : Integer, angle : Real, time : Integer):Integer
+    begin
+        declare duration:Integer;
+        result:=0;
+        for i in Sequence{1..self.servo->size()} do
+            if (id=0) or (id=i) then 
+                duration:=(self.servo->at(i).rotateTo(angle,time));
+                result:=duration.max(result) 
+            end;
+        end;
+    end
+    pre validId:    id>=0 and id<=6
+    pre validAngle: angle>=0 and (id=5 and angle<=270) or (id<>5 and angle<=180)
+    pre validTime:  time>=0
+    post targetAnglesOK:	
+        ((id=0 or id=1) implies self.servo->at(1).targetAngle = angle) and
+        ((id=0 or id=2) implies self.servo->at(2).targetAngle = angle) and
+        ((id=0 or id=3) implies self.servo->at(3).targetAngle = angle) and
+        ((id=0 or id=4) implies self.servo->at(4).targetAngle = angle) and
+        ((id=0 or id=5) implies self.servo->at(5).targetAngle = angle) and
+        ((id=0 or id=6) implies self.servo->at(6).targetAngle = angle) 
+
+    -------------------------------------------
+
+    /** rotateAllServos
+    * Makes the 6 servos rotate to the specified angles, in a given duration.
+    * Parameters s1 to s6 indicate the angles to which each servo should be rotated. 
+    * Their values should be between 0 and 270 for s5, or between 0 and 180 for the rest.
+    * Parameter "time" indicates the number of milliseconds that the rotating action should take. 
+    * The smaller the value, the faster the movements. 
+    * Time=0 indicates the servos to move as fast as possible.
+    * NOTE: This function immediately returns control, without waiting for the rotation action to complete. 
+    * The user is expected to wait until it finishes (i.e., the number of given milliseconds) before issuing 
+    * any other movement command. Otherwise, the servo will move in an indeterminate manner.
+    *
+    * @param  s1    : Real  -- angle to which servo #1 is rotated, in degrees (0<=s1<=180)
+    * @param  s2    : Real  -- angle to which servo #2 is rotated, in degrees (0<=s2<=180)
+    * @param  s3    : Real  -- angle to which servo #3 is rotated, in degrees (0<=s3<=180)
+    * @param  s4    : Real  -- angle to which servo #4 is rotated, in degrees (0<=s4<=180)
+    * @param  s5    : Real  -- angle to which servo #5 is rotated, in degrees (0<=s5<=270)
+    * @param  s6    : Real  -- angle to which servo #6 is rotated, in degrees (0<=s6<=180)
+    * @param  time  : Integer  -- running time to complete the rotation actions in milliseconds 
+    * @return result : Integer -- expected duration of the movement. 
+    *                          -- result=0 if no need to move (it was already at that angle), otherwise result = time. 
+    *                          -- if time=0, it computes the duration using the attributes self.maxSpeed of the servos.
+    */
+    rotateAllServos(s1 : Real, s2 : Real, s3 : Real, s4 : Real, s5 : Real, s6 : Real, time : Integer):Integer
+    begin
+        declare duration:Integer;
+        result:=self.servo->at(1).rotateTo(s1,time);
+        duration:=self.servo->at(2).rotateTo(s2,time); result:=duration.max(result);
+        duration:=self.servo->at(3).rotateTo(s3,time); result:=duration.max(result);
+        duration:=self.servo->at(4).rotateTo(s4,time); result:=duration.max(result);
+        duration:=self.servo->at(5).rotateTo(s5,time); result:=duration.max(result);
+        duration:=self.servo->at(6).rotateTo(s6,time); result:=duration.max(result);
+    end
+    pre validAngles: (s1>=0 and s1<=180) and 
+                    (s2>=0 and s2<=180) and 
+                    (s3>=0 and s3<=180) and 
+                    (s4>=0 and s4<=180) and 
+                    (s5>=0 and s5<=270) and 
+                    (s6>=0 and s6<=180)
+    pre validTime:  time>=0
+    post :	(self.servo->at(1).targetAngle = s1) and
+            (self.servo->at(2).targetAngle = s2) and
+            (self.servo->at(3).targetAngle = s3) and
+            (self.servo->at(4).targetAngle = s4) and
+            (self.servo->at(5).targetAngle = s5) and
+            (self.servo->at(6).targetAngle = s6) 
+    -------------------------------------------
+
+    /** rotateAllServosArray
+    * Makes the 6 servos rotate to the specified angles, in a given duration, using an array as parameter, instead of 6 values.
+    * Parameters joints is an array of 6 elements that indicates the angles to which each servo should be rotated. 
+    * Their values should be between 0 and 270 for s5, or between 0 and 180 for the rest.
+    * Parameter "time" indicates the number of milliseconds that the rotating action should take. 
+    * The smaller the value, the faster the movements. 
+    * Time=0 indicates the servos to move as fast as possible..
+    * NOTE: This function immediately returns control, without waiting for the rotation to complete. 
+    * The user is expected to wait until it finishes (i.e., the number of given milliseconds) before issuing 
+    * any other movement command. Otherwise, the servo will move in an indeterminate manner.
+    *
+    * @param  joints : Sequence(Real)  -- angles to which the 6 servos are rotated, in degrees 
+    * @param  time  : Integer  -- running time to complete the rotation actions in milliseconds 
+    * @return result : Integer -- expected duration of the movement. 
+    *                          -- result=0 if no need to move (it was already at that angle), otherwise result = time. 
+    *                          -- if time=0, it computes the duration using the attributes self.maxSpeed of the servos.
+    */
+    rotateAllServosArray(joints : Sequence(Real), time : Integer):Integer
+    begin
+        result:=self.rotateAllServos(joints->at(1), joints->at(2), joints->at(3), 
+                                    joints->at(4), joints->at(5), joints->at(6), time)
+    end
+    pre validAngles: (joints->size()=6) and 
+                    (joints->at(1)>=0 and joints->at(1)<=180) and 
+                    (joints->at(2)>=0 and joints->at(2)<=180) and 
+                    (joints->at(3)>=0 and joints->at(3)<=180) and 
+                    (joints->at(4)>=0 and joints->at(4)<=180) and 
+                    (joints->at(5)>=0 and joints->at(5)<=270) and 
+                    (joints->at(6)>=0 and joints->at(6)<=180)
+    pre validTime:  time>=0
+    post :	(self.servo->at(1).targetAngle = joints->at(1)) and
+            (self.servo->at(2).targetAngle = joints->at(2)) and
+            (self.servo->at(3).targetAngle = joints->at(3)) and
+            (self.servo->at(4).targetAngle = joints->at(4)) and
+            (self.servo->at(5).targetAngle = joints->at(5)) and
+            (self.servo->at(6).targetAngle = joints->at(6)) 
+
+    -------------------------------------------
+    /** readServo
+    * Reads the current angle value of the specified bus servo.
+    * Parameter "id" indicates the number of the servo to read (1~6).
+    * The result should be between 0 and 270 for servo#5, or between 0 and 180 for the rest.
+    *
+    * @param  id    : Integer  -- servo id (1~6)
+    * @return result : Real  --  if id=5, result=(0~270) else result=(0~180)
+    */
+    readServo(id : Integer) : Real = self.servo->at(id).currentAngle
+    pre validId:    id>=1 and id<=6
+    post validResult: result>=0 and (id=5 and result<=270) or (id<>5 and result<=180)
+    post: result = self.servo->at(id).currentAngle
+
+    -------------------------------------------
+    /** readAllServos
+    * Reads the current angle value of the 6 servos.
+    * The result is a Sequence with the current values angles. 
+    *
+    * @return result : Sequence(Real)  
+    */
+    readAllServos() : Sequence(Real) = Sequence{
+        self.servo->at(1).currentAngle,
+        self.servo->at(2).currentAngle,
+        self.servo->at(3).currentAngle,
+        self.servo->at(4).currentAngle,
+        self.servo->at(5).currentAngle,
+        self.servo->at(6).currentAngle}
+    post validAngles: (result->size()=6) and 
+                    (result->at(1)>=0 and result->at(1)<=180) and 
+                    (result->at(2)>=0 and result->at(2)<=180) and 
+                    (result->at(3)>=0 and result->at(3)<=180) and 
+                    (result->at(4)>=0 and result->at(4)<=180) and 
+                    (result->at(5)>=0 and result->at(5)<=270) and 
+                    (result->at(6)>=0 and result->at(6)<=180)
+
+
+    -------------------------------------------
+    /**
+    * Moves to the position given by coordinates x, y, z. Uses inverseKynematics() 
+    * Time=0 indicates the servos to move as fast as possible.
+    * NOTE: This function immediately returns control, without waiting for the rotation to complete. 
+    * The user is expected to wait until it finishes (i.e., the number of given milliseconds) before issuing 
+    * any other movement command. Otherwise, the servo will move in an indeterminate manner.
+    *
+    * @param  x    : Real  -- X-coordinate 
+    * @param  y    : Real  -- Y-coordinate 
+    * @param  z    : Real  -- Z-coordinate 
+    * @param  time : Integer  -- running time to complete the rotation actions in milliseconds 
+    * @return --
+    */
+    moveToXYZ(x:Real,y:Real,z:Real,time:Integer):Integer
+    begin
+    -- TDB
+    result:=time
+    end
+    pre validTime:  time>=0
+
+    -------------------------------------------
+    /** readXYZ
+    * Computes the position (x,y,z) in 3D space of the tip of the gripper (i.e., of the Arm), 
+    * given the four angles of the Arm sensors, and the lengths of the four links
+    * It uses the auxiliary operation "angleToPosition". 
+    * The result if a Tuple with the three positions (x,y,z) in millimeters
+    *
+    * @param  s1    : Real  -- angle of servo #1, in degrees (0<=s1<=180)
+    * @param  s2    : Real  -- angle of servo #2, in degrees (0<=s2<=180)
+    * @param  s3    : Real  -- angle of servo #3, in degrees (0<=s3<=180)
+    * @param  s4    : Real  -- angle of servo #4, in degrees (0<=s4<=180)
+    * @return result : Sequence(Real) -- positions x, y, z, in millimeters. 
+    */
+
+    readXYZ(s1:Real,s2:Real,s3:Real,s4:Real) : Sequence(Real) = 
+        let p:Tuple(x:Real,y:Real,z:Real) = self.config.angleToPosition(s1,s2,s3,s4) in
+        Sequence{p.x,p.y,p.z}
+
+    -------------------------------------------
+    /** cameraColor(time:Integer) 
+    * Starts the color recognition process for a given duration (if time=0, it runs forever).
+    * To stop the camera, even if running forever, just call this operation again with time=1 and it stops in 1 millisecond 
+    * @param  time : Integer -- duration, in milliseconds. If time=0, it sets   
+    * @return -- 
+    */
+    cameraColor(time:Integer) 
+    begin
+        self.camera.cameraColor(time)
+    end
+    pre validTime: time >= 0
+
+
+
+    -------------------------------------------------------------------------------
+    -- LIGHT AND BUZZER
+    -------------------------------------------------------------------------------
+
+    /**
+    * Sets the color of RGB light on the board.
+    * Parameter "red" sets the brightness of the red RGB light (0-255). The larger the value, the brighter the brightness
+    * Parameter "green" sets the brightness of the green RGB light (0-255). The larger the value, the brighter the brightness
+    * Parameter "blue" sets the brightness of the blue RGB light (0-255). The larger the value, the brighter the brightness
+    *
+    * @param  red   : Integer  -- red (0~255)
+    * @param  green : Integer  -- green (0~255)
+    * @param  blue  : Integer  -- blue (0~255) 
+    * @return String: a string with its HEX color
+    */
+    lightRGB(red : Integer, green : Integer, blue : Integer):String
+    begin 
+        self.light.set(red,green,blue);
+        result:=self.config.toHexString(self.light.red) + self.config.toHexString(self.light.green) + self.config.toHexString(self.light.blue);
+    end
+    pre validRed:       red>=0 and red<=255
+    pre validGreen:     green>=0 and green<=255
+    pre validBlue:      blue>=0 and blue<=255
+    post LightOK: self.light.red=red and self.light.green=green and self.light.blue=blue 
+
+    -- COMPLEX MOVEMENTS
+
+    -------------------------------------------
+    /** straightPosition()
+    * Sets the arm to idle position. This position corresponds to the servos angles (90, 90, 90, 90, 90, 90) 
+    * Parameter "time" indicates the number of milliseconds that the rotating action should take. 
+    * The smaller the value, the faster the movements. 
+    * Time=0 indicates the servos to move as fast as possible..
+    * NOTE: This function waits until the movement is finished.
+    *
+    * @param  time  : Integer  -- running time to complete the rotation actions in milliseconds 
+    * @return --
+    */
+    straightPosition(time : Integer)
+    begin
+        declare duration:Integer;
+        duration :=  self.rotateAllServos(90,90,90,90,90,90,time);
+        if duration>0 then (Clock.allInstances->any(true)).run(duration) end;
+    end
+    pre validTime:  time>=0
+    post MoveOK: Sequence{1..6}->forAll(i|(self.readServo(i)-90).abs()<self.config.ANGULAR_PRECISION)
+
+    -------------------------------------------
+    /** readyPosition()
+    * Sets the arm to idle position. This position corresponds to the servos angles (90, 130, 0, 0, 270, 60) 
+    * Parameter "time" indicates the number of milliseconds that the rotating action should take. 
+    * The smaller the value, the faster the movements. 
+    * Time=0 indicates the servos to move as fast as possible..
+    * NOTE: This function waits until the movement is finished.
+    *
+    * @param  time  : Integer  -- running time to complete the rotation actions in milliseconds 
+    * @return --
+    */
+    readyPosition(time : Integer)
+    begin
+        declare duration:Integer;
+        duration :=  self.rotateAllServos(90,130,0,0,270,60,time);
+        if duration>0 then (Clock.allInstances->any(true)).run(duration) end;
+    end
+    pre validTime:  time>=0
+    post MoveOK: let S:Sequence(Real)=Sequence{90,130,0,0,270,60} in 
+                Sequence{1..6}->forAll(i|(self.readServo(i) - S->at(i)).abs()<self.config.ANGULAR_PRECISION)
+
+
+    -------------------------------------------
+    /** closeGrip()
+    * Moves the servo No. 6 which closes the grip and grabs the object. 
+    * It uses the previous position of the servos (1~5) and modifies the value of the servo No. 6 to close it.
+    * Parameter "time" indicates the number of milliseconds that the rotating action should take. 
+    * The smaller the value, the faster the movements. 
+    * Time=0 indicates the servos to move as fast as possible..
+    * NOTE: This function waits until the movement is finished.
+    *
+    * @param  time  : Integer  -- running time to complete the rotation actions in milliseconds 
+    * @return --
+    */
+    closeGrip(time : Integer)
+    begin
+        declare duration:Integer;
+        duration :=  self.rotateServo(6,60,time);
+        if duration>0 then (Clock.allInstances->any(true)).run(duration) end;
+    end
+    pre validTime:  time>=0
+    post: (self.readServo(6)-60).abs()<self.config.ANGULAR_PRECISION
+
+    -------------------------------------------
+    /** openGrip()
+    * Moves the servo No. 6 which opens the grip and releases the object. 
+    * It uses the previous position of the servos (1~5) and then modifies the value of the servo No. 6 to open it.
+    * Parameter "time" indicates the number of milliseconds that the rotating action should take. 
+    * The smaller the value, the faster the movements. 
+    * Time=0 indicates the servos to move as fast as possible..
+    * NOTE: This function waits until the movement is finished.
+    *
+    * @param  time  : Integer  -- running time to complete the rotation actions in milliseconds 
+    * @return --
+    */
+    openGrip(time : Integer)
+    begin
+        declare duration:Integer;
+        duration :=  self.rotateServo(6,180,time);
+        if duration>0 then (Clock.allInstances->any(true)).run(duration) end;
+    end
+    pre validTime:  time>=0
+    post: (self.readServo(6)-180).abs()<self.config.ANGULAR_PRECISION
+
+
+    end -- class NiryoNedArm
+
+
+
+constraints 
+context Clock inv OnlyOneClock: 
+    Clock.allInstances->size()=1

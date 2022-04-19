@@ -1,0 +1,120 @@
+model Test
+
+enum Action {Forward, Rotate}
+
+
+abstract class ActiveObject
+    operations
+        action() begin end
+    end
+
+class Clock
+    attributes
+        now : Integer           init: 1627484732
+        tickTime : Integer      init : 20
+    operations
+        tick()
+          begin
+            for o in self.ao do
+              o.action();
+            end;
+            self.now := self.now + self.tickTime;
+          end
+    end
+
+association Timing between
+    Clock [1] role clock
+    ActiveObject [*] role ao ordered
+end
+
+------- DIGITAL SHADOWS
+
+abstract class Snapshot
+    attributes
+        timestamp : Integer
+        executionId : Integer 
+    end
+
+abstract class CarSnapshot < Snapshot
+    attributes
+        twinId : String          init: 'NXJCar'
+        xPos : Real             init: 0.0
+        yPos : Real             init: 0.0
+        angle : Real            init: 0.0
+        speed : Real            init: 31.28
+        isMoving : Boolean      init: false
+        distance : Integer      init: 40  
+        bump : Boolean     init: false         
+        light : Integer init: 45   
+        action : Action       
+        processingQueue : Boolean init: false
+    end
+
+class OutputCarSnapshot < CarSnapshot
+    end
+
+class InputCarSnapshot < CarSnapshot
+    end
+
+------------ MONITOR
+
+class Monitor < ActiveObject
+    attributes
+        precision : Real init: 0.1
+    operations
+        action() 
+            begin
+                declare iSnap: Set(InputCarSnapshot), oSnap: Set(OutputCarSnapshot), os:OutputCarSnapshot, mm:Mismatch;
+                iSnap := InputCarSnapshot.allInstances->select(i|i.mm->isEmpty);
+                oSnap := OutputCarSnapshot.allInstances->select(o|o.mm->isEmpty);
+                for is in iSnap do
+                    os:=oSnap->select(o| (o.twinId = is.twinId) and 
+                            (o.executionId = is.executionId) and
+                            (o.timestamp=is.timestamp))->any(true);
+                    if os<>null then
+                        if not self.compare(is,os) then
+                            mm:=new Mismatch();
+                            insert(self,mm) into Mismatches;
+                            insert(mm,is) into SourceMismatch;
+                            insert(mm,os) into TargetMismatch;
+                        else
+                            destroy(is);
+                            destroy(os);
+                        end;  
+                    end;
+                end;
+            end
+        compare(i:InputCarSnapshot,o:OutputCarSnapshot): Boolean = 
+            (i.xPos-o.xPos).abs<=self.precision and
+            (i.yPos-o.yPos).abs<=self.precision and
+            (i.angle-o.angle).abs<=self.precision
+
+    end -- class Monitor
+
+class Mismatch 
+end
+
+aggregation SourceMismatch between
+Mismatch [*] role mm
+InputCarSnapshot [1] role physical
+end
+
+aggregation TargetMismatch between
+Mismatch [*] role mm
+OutputCarSnapshot [1] role virtual
+end
+
+aggregation Mismatches between
+Monitor [0..1] role monitor 
+Mismatch [*] role mismatch
+end
+
+class AnalysisConfiguration -- It is needed to know which execution we want to analyze
+    attributes
+        executionId : Integer       init: 1627763802
+        twinId : String             init: 'NXJCar'
+end
+
+
+
+

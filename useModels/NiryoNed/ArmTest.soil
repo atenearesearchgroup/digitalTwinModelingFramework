@@ -1,0 +1,52 @@
+reset
+!new Clock('c')
+!new DofbotArm('arm')
+!new Buzzer('b')
+!insert (arm,b) into Buzzers
+!new Light('l')
+!insert (arm,l) into Lights
+!new Servo('s1')
+!new Servo('s2')
+!new Servo('s3')
+!new Servo('s4')
+!new Servo('wrist')
+!new Servo('grip')
+!insert (arm,s1) into Parts
+!insert (arm,s2) into Parts
+!insert (arm,s3) into Parts
+!insert (arm,s4) into Parts
+!insert (arm,wrist) into Parts
+!insert (arm,grip) into Parts
+!new Camera('cam')
+!insert (arm,cam) into Cameras
+!new Environment('env')
+!insert (arm,env) into Env
+!insert (c,b) into Time
+!insert (c,s1) into Time
+!insert (c,s2) into Time
+!insert (c,s3) into Time
+!insert (c,s4) into Time
+!insert (c,wrist) into Time
+!insert (c,grip) into Time
+!insert (c,cam) into Time
+!new Test('test')
+!insert (test,arm) into TestDriver
+check
+!test.testStraightPosition(200)
+?arm.position
+?arm.angles
+!test.testReadyPosition(200)
+?arm.position
+?arm.angles
+!test.testCloseGrip(200)
+?arm.position
+?arm.angles
+!test.testOpenGrip(200)
+?arm.position
+?arm.angles
+!test.testStraightPosition(200)
+?arm.position
+?arm.angles
+
+
+

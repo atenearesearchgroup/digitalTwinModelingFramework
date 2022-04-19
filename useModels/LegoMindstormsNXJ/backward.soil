@@ -1,0 +1,4 @@
+!new Command('c4');
+!c4.twinId := 'NXJCar';
+!c4.action := Action::Backward;
+!c4.initialize();

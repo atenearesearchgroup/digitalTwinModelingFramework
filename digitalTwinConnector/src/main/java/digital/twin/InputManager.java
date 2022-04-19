@@ -19,7 +19,7 @@ public abstract class InputManager {
      * @return Returns the list of unprocessed snapshots stored in the Data Lake
      */
     public Set<String> getUnprocessedObjects(Jedis jedis) {
-        return jedis.zrangeByScore(this.CLASS_KEY, "[0", "(1");
+        return jedis.zrangeByScore(this.CLASS_KEY, "0", "0");
     }
 
     public abstract void saveObjects(UseSystemApi api, Jedis jedis, ConfigurationManager cm) throws UseApiException;

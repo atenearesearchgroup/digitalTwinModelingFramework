@@ -31,14 +31,14 @@ public class InputCommandsManager extends InputManager{
     public void saveObjects(UseSystemApi api, Jedis jedis, ConfigurationManager cm) throws UseApiException {
         Set<String> unprocessedCommands = getUnprocessedObjects(jedis);
         for (String command : unprocessedCommands) {
-            String snapshotId = command.substring(2);
             Map<String, String> values = jedis.hgetAll(command);
 
-            String snapshotName = "in" + StringUtil.toCamel(snapshotId.split(":")[0])
-                    + StringUtil.toCamel(snapshotId.split(":")[1])
-                    + StringUtil.toCamel(snapshotId.split(":")[2]);
-            api.createObject(cm.getInCommandClass(), snapshotName);
+            String snapshotName = "in" + StringUtil.toCamel(command.split(":")[0])
+                    + StringUtil.toCamel(command.split(":")[1])
+                    + StringUtil.toCamel(command.split(":")[2]);
             System.out.println("[Snapshot] " + snapshotName);
+            api.createObject(cm.getInCommandClass(), snapshotName);
+            System.out.println("[Snapshot-created] " + snapshotName);
 
             for (String value : values.keySet()) {
                 //System.out.println("[Snapshot] " + value + " : " + values.get(value));
@@ -49,8 +49,8 @@ public class InputCommandsManager extends InputManager{
                     api.setAttributeValue(snapshotName, value, OCLUtil.setOCLExpression(type, values.get(value)));
                 }
             }
-            jedis.zincrby(CLASS_KEY, 1, snapshotId);
-            jedis.hset(snapshotId, "processedDT", "1");
+            jedis.zincrby(CLASS_KEY, 1, command);
+            jedis.hset(command, "processedDT", "1");
         }
     }
 }

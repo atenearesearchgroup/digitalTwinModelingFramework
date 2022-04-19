@@ -1,0 +1,21 @@
+reset
+!new Clock('clock');
+!new Monitor('monitor1');
+!insert(clock, monitor1) into Timing;
+!new InputCarSnapshot('InputCarSnapshot5')
+!new OutputCarSnapshot('OutputCarSnapshot4')
+!InputCarSnapshot5.timestamp := 1627484755+20*4
+!InputCarSnapshot5.executionId := 1627484055
+!InputCarSnapshot5.xPos := 11.12+5.56*3
+!InputCarSnapshot5.angle := 0.0
+!InputCarSnapshot5.isMoving := true
+!InputCarSnapshot5.distance := 89
+!InputCarSnapshot5.action := Action::Forward
+!OutputCarSnapshot4.timestamp := 1627484755+20*4
+!OutputCarSnapshot4.xPos := 11.13+5.6*3
+!OutputCarSnapshot4.executionId := '1627484055'
+!OutputCarSnapshot4.angle := 0.0
+!OutputCarSnapshot4.isMoving := true
+!OutputCarSnapshot4.distance := 89
+!OutputCarSnapshot4.action := Action::Forward
+

@@ -1,0 +1,52 @@
+reset
+!new Clock('c')
+!new NiryoNedArm('arm')
+!new Buzzer('b')
+!insert (arm,b) into Buzzers
+!new Light('l')
+!insert (arm,l) into Lights
+!new Servo('s1')
+!new Servo('s2')
+!new Servo('s3')
+!new Servo('s4')
+!new Servo('wrist')
+!new Servo('grip')
+!insert (arm,s1) into Parts
+!insert (arm,s2) into Parts
+!insert (arm,s3) into Parts
+!insert (arm,s4) into Parts
+!insert (arm,wrist) into Parts
+!insert (arm,grip) into Parts
+!new Camera('cam')
+!insert (arm,cam) into Cameras
+!new Configuration('config')
+!insert (arm,config) into Config
+!insert (c,b) into Time
+!insert (c,s1) into Time
+!insert (c,s2) into Time
+!insert (c,s3) into Time
+!insert (c,s4) into Time
+!insert (c,wrist) into Time
+!insert (c,grip) into Time
+!insert (c,cam) into Time
+check
+!arm.straightPosition(200)
+?arm.position
+?arm.angles
+!arm.readyPosition(200)
+?arm.position
+?arm.angles
+!arm.closeGrip(200)
+?arm.position
+?arm.angles
+!arm.openGrip(200)
+?arm.position
+?arm.angles
+!new CommandManager('comMan')
+!insert(comMan, arm) into CommandManagement;
+!insert(c, comMan) into Time;
+!new SnapshotManager('snaMan')
+!insert(c, snaMan) into Time;
+
+
+check

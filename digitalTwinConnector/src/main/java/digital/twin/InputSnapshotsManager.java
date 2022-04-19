@@ -30,12 +30,12 @@ public class InputSnapshotsManager extends InputManager{
     public void saveObjects(UseSystemApi api, Jedis jedis, ConfigurationManager cm) throws UseApiException {
         Set<String> unprocessedSnapshots = getUnprocessedObjects(jedis);
         for (String snapshot : unprocessedSnapshots) {
-            String snapshotId = snapshot.substring(2);
-            Map<String, String> values = jedis.hgetAll(snapshotId);
+            Map<String, String> values = jedis.hgetAll(snapshot);
 
-            String snapshotName = "in" + snapshotId.split(":")[0] + snapshotId.split(":")[2];
-            api.createObject(cm.getInputClass(), snapshotName);
+            String snapshotName = "in" + snapshot.split(":")[0] + snapshot.split(":")[2];
             System.out.println("[Snapshot] " + snapshotName);
+            api.createObject(cm.getInputClass(), snapshotName);
+            System.out.println("[Snapshot-created] " + snapshotName);
 
             for (String value : values.keySet()) {
                 //System.out.println("[Snapshot] " + value + " : " + values.get(value));
@@ -47,8 +47,8 @@ public class InputSnapshotsManager extends InputManager{
                 }
             }
 
-            jedis.zincrby(CLASS_KEY, 1, snapshotId);
-            jedis.hset(snapshotId, "processingQueue", "1");
+            jedis.zincrby(CLASS_KEY, 1, snapshot);
+            jedis.hset(snapshot, "processingQueue", "1");
         }
     }
 }

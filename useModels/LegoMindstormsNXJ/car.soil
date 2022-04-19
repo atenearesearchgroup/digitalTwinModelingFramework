@@ -1,0 +1,6 @@
+reset
+!new Clock('clock');
+!new Car('car');
+!car.init();
+!car.twinId := 'NXJCar'
+!insert(clock, car) into Timing;

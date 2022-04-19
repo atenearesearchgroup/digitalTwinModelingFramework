@@ -1,17 +1,18 @@
-outputClass: OutputArmSnapshot
+outputClass: OutputCarSnapshot
 outputAttributes:
   twinId : str
   timestamp : double
   executionId : double
-  servo1 : double
-  servo2 : double
-  servo3 : double
-  servo4 : double
-  servo5 : double
-  servo6 : double
-  moving : boolean
-  processingQueue : boolean
-inputClass: InputArmSnapshot
+  xPos : double
+  yPos : double
+  angle : double
+  speed : double
+  light : double
+  distance : double
+  bump : boolean
+  isMoving : boolean
+  action : str
+inputClass: InputCarSnapshot
 outCommandClass: OutCommand
 inCommandClass: Command
 commandAttributes:
